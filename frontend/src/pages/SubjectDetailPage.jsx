@@ -27,32 +27,29 @@ export default function SubjectDetailPage() {
   }, [id]);
 
   return (
-    <div className="min-h-screen bg-[#2E7CF7] pb-16">
+    <div className="min-h-screen bg-app pb-16">
       <NavBar />
-      <main className="max-w-6xl mx-auto px-4 mt-8">
-        <Link to="/subjects" data-testid="back-to-subjects" className="inline-flex items-center gap-2 text-white/80 hover:text-white mb-4 font-bold">
-          <ArrowLeft size={18} /> All subjects
+      <main className="max-w-7xl mx-auto px-4 mt-8">
+        <Link to="/subjects" data-testid="back-to-subjects" className="inline-flex items-center gap-2 text-slate-600 hover:text-slate-900 mb-4 font-semibold text-sm">
+          <ArrowLeft size={16} /> All subjects
         </Link>
         {subject && (
-          <header className="bg-white rounded-[2rem] p-7 shadow-2xl mb-5 relative overflow-hidden fade-up">
-            <div className="blob-lime" style={{ width: 180, height: 180, top: -50, right: -50, opacity: 0.5 }} />
-            <div className="relative">
-              <p className="text-xs font-bold uppercase tracking-widest text-slate-500">Subject</p>
-              <h1 className="font-display text-4xl sm:text-5xl font-bold text-slate-900 mt-1">{subject.title}</h1>
-              {subject.description && <p className="text-slate-600 mt-2 max-w-2xl">{subject.description}</p>}
-            </div>
+          <header className="bg-hero rounded-[2rem] border border-slate-200/60 p-7 sm:p-9 mb-5 fade-up">
+            <p className="text-xs font-bold uppercase tracking-widest text-slate-500">Subject</p>
+            <h1 className="font-display text-4xl sm:text-5xl font-bold text-slate-900 mt-1 leading-tight">{subject.title}</h1>
+            {subject.description && <p className="text-slate-600 mt-2 max-w-2xl">{subject.description}</p>}
           </header>
         )}
 
         {/* Tabs */}
-        <nav className="bg-white rounded-full shadow-xl p-2 flex gap-1 overflow-x-auto mb-5">
+        <nav className="card p-1.5 flex gap-1 overflow-x-auto mb-5" style={{ borderRadius: 9999 }}>
           {TABS.map((t) => (
             <button
               key={t.id}
               data-testid={t.testId}
               onClick={() => setTab(t.id)}
-              className={`px-4 py-2.5 rounded-full font-bold text-sm inline-flex items-center gap-2 whitespace-nowrap transition ${
-                tab === t.id ? "bg-[#1D4ED8] text-white" : "text-slate-700 hover:bg-slate-100"
+              className={`px-4 py-2.5 rounded-full font-semibold text-sm inline-flex items-center gap-2 whitespace-nowrap transition ${
+                tab === t.id ? "bg-slate-900 text-white" : "text-slate-700 hover:bg-slate-100"
               }`}
             >
               <t.icon size={16} /> {t.label}

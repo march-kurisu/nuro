@@ -34,24 +34,20 @@ export default function AuthPage({ mode = "login" }) {
   };
 
   return (
-    <div className="min-h-screen bg-[#2E7CF7] relative overflow-hidden">
-      <div className="blob-lime" style={{ width: 300, height: 300, top: -100, left: -100, opacity: 0.4 }} />
-      <div className="blob-lime" style={{ width: 400, height: 400, bottom: -180, right: -180, opacity: 0.35 }} />
-
-      <div className="relative max-w-md mx-auto px-6 pt-12">
-        <Link to="/" className="inline-flex items-center gap-2 mb-8 text-white">
-          <div className="w-11 h-11 rounded-full bg-[#C5E92E] flex items-center justify-center shadow-lg">
-            <Sparkles size={22} className="text-slate-900" />
-          </div>
-          <span className="font-display text-3xl font-bold">Nuro</span>
+    <div className="min-h-screen bg-hero">
+      <div className="max-w-md mx-auto px-6 pt-10">
+        <Link to="/" className="inline-flex items-center gap-2 mb-8" data-testid="auth-back-home">
+          <span className="icon-square" style={{ width: 36, height: 36, borderRadius: 10 }}>
+            <Sparkles size={18} strokeWidth={2.5} />
+          </span>
+          <span className="font-display text-2xl font-bold text-slate-900">Nuro</span>
         </Link>
 
-        <div className="bg-white rounded-[2rem] shadow-2xl p-8 relative fade-up">
-          <div className="paperclip" />
-          <h1 className="font-display text-4xl font-bold text-slate-900">
+        <div className="card p-8 fade-up">
+          <h1 className="font-display text-3xl sm:text-4xl font-bold text-slate-900 leading-tight">
             {isLogin ? "Welcome back" : "Create your account"}
           </h1>
-          <p className="text-slate-500 mt-2">
+          <p className="text-slate-500 mt-1">
             {isLogin ? "Continue your learning journey." : "Start your AI-powered study session."}
           </p>
 
@@ -59,9 +55,9 @@ export default function AuthPage({ mode = "login" }) {
             data-testid="auth-google-btn"
             onClick={googleLogin}
             type="button"
-            className="mt-6 w-full px-5 py-3.5 rounded-full bg-slate-900 text-white font-bold flex items-center justify-center gap-3 hover:-translate-y-0.5 transition-transform"
+            className="mt-6 btn-dark w-full justify-center text-base py-3"
           >
-            <svg width="20" height="20" viewBox="0 0 24 24"><path fill="#fff" d="M21.35 11.1H12v2.99h5.31c-.51 2.74-2.83 3.99-5.31 3.99c-3.31 0-6-2.69-6-6s2.69-6 6-6c1.49 0 2.84.54 3.89 1.42l2.13-2.13C16.46 3.83 14.34 3 12 3C7.03 3 3 7.03 3 12s4.03 9 9 9c4.5 0 8.59-3.28 8.59-9c0-.55-.05-1.1-.14-1.65z"/></svg>
+            <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#fff" d="M21.35 11.1H12v2.99h5.31c-.51 2.74-2.83 3.99-5.31 3.99c-3.31 0-6-2.69-6-6s2.69-6 6-6c1.49 0 2.84.54 3.89 1.42l2.13-2.13C16.46 3.83 14.34 3 12 3C7.03 3 3 7.03 3 12s4.03 9 9 9c4.5 0 8.59-3.28 8.59-9c0-.55-.05-1.1-.14-1.65z"/></svg>
             Continue with Google
           </button>
 
@@ -82,7 +78,7 @@ export default function AuthPage({ mode = "login" }) {
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   required
-                  className="w-full pl-12 pr-4 py-3.5 rounded-full bg-slate-100 border-2 border-transparent focus:border-[#1D4ED8] focus:bg-white outline-none transition"
+                  className="input with-icon"
                 />
               </div>
             )}
@@ -95,7 +91,7 @@ export default function AuthPage({ mode = "login" }) {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
-                className="w-full pl-12 pr-4 py-3.5 rounded-full bg-slate-100 border-2 border-transparent focus:border-[#1D4ED8] focus:bg-white outline-none transition"
+                className="input with-icon"
               />
             </div>
             <div className="relative">
@@ -108,14 +104,14 @@ export default function AuthPage({ mode = "login" }) {
                 onChange={(e) => setPassword(e.target.value)}
                 minLength={6}
                 required
-                className="w-full pl-12 pr-4 py-3.5 rounded-full bg-slate-100 border-2 border-transparent focus:border-[#1D4ED8] focus:bg-white outline-none transition"
+                className="input with-icon"
               />
             </div>
             <button
               data-testid="auth-submit-btn"
               type="submit"
               disabled={busy}
-              className="w-full px-5 py-3.5 rounded-full bg-[#C5E92E] text-slate-900 font-bold text-lg hover:-translate-y-0.5 transition-transform disabled:opacity-50 disabled:translate-y-0"
+              className="btn-yellow w-full justify-center text-base py-3 disabled:opacity-50"
             >
               {busy ? "..." : isLogin ? "Log in" : "Create account"}
             </button>
@@ -126,7 +122,7 @@ export default function AuthPage({ mode = "login" }) {
             <Link
               data-testid="auth-switch-link"
               to={isLogin ? "/register" : "/login"}
-              className="font-bold text-[#1D4ED8] hover:underline"
+              className="font-bold text-slate-900 underline decoration-[#E4F222] decoration-4 underline-offset-2 hover:decoration-yellow-400"
             >
               {isLogin ? "Create an account" : "Log in"}
             </Link>

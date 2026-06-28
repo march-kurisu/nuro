@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
 import api from "@/lib/api";
-import { TrendingUp, Brain } from "lucide-react";
+import { Brain } from "lucide-react";
 
 const colorFor = (p) => {
   if (p >= 80) return "#16A34A";
-  if (p >= 50) return "#1D4ED8";
+  if (p >= 50) return "#E4B600";
   if (p >= 25) return "#F59E0B";
   return "#94A3B8";
 };
@@ -22,8 +22,8 @@ export default function MasteryTab({ subjectId }) {
 
   return (
     <div className="space-y-5">
-      <div className="bg-slate-900 text-white rounded-[2rem] p-7 shadow-2xl relative overflow-hidden">
-        <div className="blob-lime" style={{ width: 200, height: 200, bottom: -60, right: -60, opacity: 0.6 }} />
+      <div className="card-dark p-7 relative overflow-hidden">
+        <span className="absolute -top-20 -right-20 w-60 h-60 rounded-full" style={{ background: "#E4F222", opacity: 0.18, filter: "blur(50px)" }} />
         <div className="relative grid sm:grid-cols-[1fr_auto] gap-5 items-center">
           <div>
             <div className="text-xs font-bold uppercase tracking-widest text-white/60">Mastery Map</div>
@@ -38,18 +38,16 @@ export default function MasteryTab({ subjectId }) {
       </div>
 
       {items.length === 0 ? (
-        <div className="bg-white rounded-[2rem] p-12 text-center shadow-xl">
-          <div className="w-16 h-16 rounded-full bg-[#E0E7FF] flex items-center justify-center mx-auto mb-3">
-            <Brain size={28} className="text-[#1D4ED8]" />
-          </div>
+        <div className="card p-12 text-center">
+          <div className="icon-square mx-auto mb-3"><Brain size={20} /></div>
           <p className="font-display text-xl font-bold text-slate-900">No topics tracked yet</p>
           <p className="text-slate-500 mt-1 text-sm">Generate a curriculum or take quizzes — topics appear here automatically.</p>
         </div>
       ) : (
-        <div className="bg-white rounded-[2rem] p-7 shadow-xl">
+        <div className="card p-7">
           <div className="grid sm:grid-cols-2 gap-4">
             {items.map((t) => (
-              <div key={t.topic_id} className="p-5 rounded-2xl border-2 border-slate-100 hover:border-[#C5E92E] transition" data-testid={`mastery-topic-${t.topic_id}`}>
+              <div key={t.topic_id} className="p-5 rounded-2xl border border-slate-200 hover:border-slate-900 transition" data-testid={`mastery-topic-${t.topic_id}`}>
                 <div className="flex items-start justify-between gap-3">
                   <div className="min-w-0">
                     <div className="font-bold text-slate-900 truncate">{t.name}</div>

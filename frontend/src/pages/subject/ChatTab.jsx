@@ -6,7 +6,6 @@ export default function ChatTab({ subjectId }) {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
   const [streaming, setStreaming] = useState(false);
-  const [sources, setSources] = useState([]);
   const [sessionId, setSessionId] = useState(null);
   const endRef = useRef(null);
 
@@ -31,7 +30,6 @@ export default function ChatTab({ subjectId }) {
     const text = input;
     setInput("");
     setStreaming(true);
-    setSources([]);
 
     let assistantBuffer = "";
     const assistantId = `tmp_a_${Date.now()}`;
@@ -70,22 +68,21 @@ export default function ChatTab({ subjectId }) {
                 m.map((mm) => (mm.msg_id === assistantId ? { ...mm, content: assistantBuffer } : mm))
               );
             } else if (type === "sources") {
-              setSources(data);
               setMessages((m) =>
                 m.map((mm) => (mm.msg_id === assistantId ? { ...mm, sources: data } : mm))
               );
             } else if (type === "session") {
               setSessionId(data.session_id);
             } else if (type === "error") {
-              assistantBuffer += `\n\n_⚠️ ${data.message}_`;
+              assistantBuffer += `\n\n_${data.message}_`;
               setMessages((m) =>
                 m.map((mm) => (mm.msg_id === assistantId ? { ...mm, content: assistantBuffer } : mm))
               );
             }
-          } catch {}
+          } catch { /* ignore parse */ }
         }
       }
-    } catch (e) {
+    } catch {
       setMessages((m) =>
         m.map((mm) => (mm.msg_id === assistantId ? { ...mm, content: "Sorry, something went wrong." } : mm))
       );
@@ -95,32 +92,28 @@ export default function ChatTab({ subjectId }) {
   };
 
   return (
-    <div className="bg-white rounded-[2rem] shadow-xl overflow-hidden flex flex-col h-[70vh]">
-      <div className="p-5 border-b flex items-center gap-3 bg-slate-900 text-white">
-        <div className="w-10 h-10 rounded-full bg-[#C5E92E] flex items-center justify-center">
-          <Sparkles size={20} className="text-slate-900" />
-        </div>
+    <div className="card overflow-hidden flex flex-col h-[70vh]">
+      <div className="p-5 border-b border-slate-100 flex items-center gap-3 bg-slate-900 text-white">
+        <span className="icon-square"><Sparkles size={18} strokeWidth={2.4} /></span>
         <div>
           <h3 className="font-display text-xl font-bold">Study chat</h3>
           <p className="text-xs text-white/70">Grounded in your uploaded materials</p>
         </div>
       </div>
 
-      <div className="flex-1 overflow-y-auto p-5 space-y-4">
+      <div className="flex-1 overflow-y-auto p-5 space-y-4 bg-app">
         {messages.length === 0 && (
           <div className="text-center py-10">
-            <div className="w-16 h-16 rounded-full bg-[#FFEDD5] flex items-center justify-center mx-auto mb-3">
-              <Bot size={28} className="text-orange-600" />
-            </div>
+            <div className="icon-square mx-auto mb-3"><Bot size={20} /></div>
             <p className="font-display text-xl font-bold text-slate-900">Ask anything</p>
-            <p className="text-slate-500 mt-1 text-sm">Try "Summarize chapter 1" or "Quiz me on key terms".</p>
+            <p className="text-slate-500 mt-1 text-sm">Try &quot;Summarize chapter 1&quot; or &quot;Quiz me on key terms&quot;.</p>
           </div>
         )}
         {messages.map((m) => (
           <div key={m.msg_id} className={`flex gap-3 ${m.role === "user" ? "justify-end" : "justify-start"}`}>
             {m.role === "assistant" && (
-              <div className="w-9 h-9 shrink-0 rounded-full bg-[#C5E92E] flex items-center justify-center">
-                <Bot size={18} className="text-slate-900" />
+              <div className="icon-square shrink-0" style={{ width: 36, height: 36, borderRadius: 10 }}>
+                <Bot size={16} strokeWidth={2.4} />
               </div>
             )}
             <div className={`max-w-[75%] px-4 py-3 ${m.role === "user" ? "bubble-user" : "bubble-ai"}`}>
@@ -128,7 +121,7 @@ export default function ChatTab({ subjectId }) {
               {m.role === "assistant" && m.sources && m.sources.length > 0 && (
                 <div className="mt-2 pt-2 border-t border-slate-200 flex flex-wrap gap-1">
                   {m.sources.map((s, i) => (
-                    <span key={i} className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-white text-[10px] font-bold text-slate-600">
+                    <span key={i} className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-white border border-slate-200 text-[10px] font-bold text-slate-600">
                       <FileText size={10} /> {s.title} #{(s.ord || 0) + 1}
                     </span>
                   ))}
@@ -136,7 +129,7 @@ export default function ChatTab({ subjectId }) {
               )}
             </div>
             {m.role === "user" && (
-              <div className="w-9 h-9 shrink-0 rounded-full bg-[#1D4ED8] flex items-center justify-center">
+              <div className="w-9 h-9 shrink-0 rounded-full bg-slate-900 flex items-center justify-center">
                 <UserIcon size={16} className="text-white" />
               </div>
             )}
@@ -145,22 +138,22 @@ export default function ChatTab({ subjectId }) {
         <div ref={endRef} />
       </div>
 
-      <form onSubmit={send} className="border-t p-4 flex gap-2">
+      <form onSubmit={send} className="border-t border-slate-100 p-4 flex gap-2 bg-white">
         <input
           data-testid="chat-input"
           value={input}
           onChange={(e) => setInput(e.target.value)}
           placeholder="Ask your AI study coach…"
           disabled={streaming}
-          className="flex-1 px-5 py-3 rounded-full bg-slate-100 focus:bg-white border-2 border-transparent focus:border-[#1D4ED8] outline-none transition"
+          className="input"
         />
         <button
           data-testid="chat-send-btn"
           type="submit"
           disabled={streaming || !input.trim()}
-          className="px-5 py-3 rounded-full bg-[#1D4ED8] text-white font-bold inline-flex items-center gap-2 disabled:opacity-40"
+          className="btn-dark disabled:opacity-40"
         >
-          <Send size={16} /> Send
+          <Send size={14} /> Send
         </button>
       </form>
     </div>

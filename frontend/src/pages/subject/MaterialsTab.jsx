@@ -15,7 +15,7 @@ export default function MaterialsTab({ subjectId }) {
     const { data } = await api.get(`/subjects/${subjectId}/materials`);
     setItems(data);
   };
-  useEffect(() => { load(); }, [subjectId]);
+  useEffect(() => { load(); /* eslint-disable-next-line */ }, [subjectId]);
 
   const upload = async (file) => {
     setBusy(true);
@@ -51,7 +51,7 @@ export default function MaterialsTab({ subjectId }) {
       toast.success(`Indexed ${data.chunks} chunks`);
       setTextTitle(""); setTextContent(""); setShowText(false);
       load();
-    } catch (e) {
+    } catch {
       toast.error("Could not add material");
     } finally {
       setBusy(false);
@@ -67,47 +67,35 @@ export default function MaterialsTab({ subjectId }) {
 
   return (
     <div className="space-y-5">
-      <div className="bg-white rounded-[2rem] p-6 shadow-xl">
+      <div className="card p-6">
         <div className="flex items-center justify-between flex-wrap gap-3">
           <div>
             <h3 className="font-display text-2xl font-bold text-slate-900">Study materials</h3>
             <p className="text-slate-500 text-sm">Upload PDFs, text, or markdown. We index them so chat & quizzes stay grounded.</p>
           </div>
           <div className="flex gap-2">
-            <button
-              data-testid="materials-upload-btn"
-              onClick={() => fileRef.current?.click()}
-              disabled={busy}
-              className="px-4 py-2.5 rounded-full bg-[#C5E92E] text-slate-900 font-bold inline-flex items-center gap-2 hover:-translate-y-0.5 transition-transform disabled:opacity-50"
-            >
-              <Upload size={16} /> Upload file
+            <button data-testid="materials-upload-btn" onClick={() => fileRef.current?.click()} disabled={busy} className="btn-yellow disabled:opacity-50">
+              <Upload size={14} /> Upload file
             </button>
             <input
-              ref={fileRef}
-              type="file"
-              accept=".pdf,.txt,.md"
-              className="hidden"
+              ref={fileRef} type="file" accept=".pdf,.txt,.md" className="hidden"
               data-testid="materials-file-input"
               onChange={(e) => e.target.files?.[0] && upload(e.target.files[0])}
             />
-            <button
-              data-testid="materials-paste-btn"
-              onClick={() => setShowText((v) => !v)}
-              className="px-4 py-2.5 rounded-full bg-slate-900 text-white font-bold inline-flex items-center gap-2 hover:-translate-y-0.5 transition-transform"
-            >
-              <Type size={16} /> Paste text
+            <button data-testid="materials-paste-btn" onClick={() => setShowText((v) => !v)} className="btn-dark">
+              <Type size={14} /> Paste text
             </button>
           </div>
         </div>
 
         {showText && (
-          <form onSubmit={submitText} className="mt-5 space-y-3 p-5 rounded-2xl bg-slate-50">
+          <form onSubmit={submitText} className="mt-5 space-y-3 p-5 rounded-2xl bg-slate-50 border border-slate-100">
             <input
               data-testid="materials-text-title"
               value={textTitle}
               onChange={(e) => setTextTitle(e.target.value)}
               placeholder="Material title (e.g., 'Chapter 3 notes')"
-              className="w-full px-4 py-3 rounded-full bg-white border-2 border-slate-200 focus:border-[#1D4ED8] outline-none"
+              className="input"
             />
             <textarea
               data-testid="materials-text-content"
@@ -115,15 +103,11 @@ export default function MaterialsTab({ subjectId }) {
               onChange={(e) => setTextContent(e.target.value)}
               placeholder="Paste study notes here…"
               rows={8}
-              className="w-full px-4 py-3 rounded-3xl bg-white border-2 border-slate-200 focus:border-[#1D4ED8] outline-none resize-y"
+              className="input"
+              style={{ borderRadius: 20, resize: "vertical" }}
             />
-            <button
-              data-testid="materials-text-submit"
-              type="submit"
-              disabled={busy}
-              className="px-5 py-3 rounded-full bg-[#1D4ED8] text-white font-bold inline-flex items-center gap-2 disabled:opacity-50"
-            >
-              <Plus size={16} /> Add material
+            <button data-testid="materials-text-submit" type="submit" disabled={busy} className="btn-dark disabled:opacity-50">
+              <Plus size={14} /> Add material
             </button>
           </form>
         )}
@@ -131,19 +115,17 @@ export default function MaterialsTab({ subjectId }) {
 
       <div className="grid sm:grid-cols-2 gap-4">
         {items.length === 0 && (
-          <div className="col-span-full bg-white rounded-[2rem] p-10 text-center shadow-xl">
-            <div className="w-16 h-16 rounded-full bg-[#FFEDD5] flex items-center justify-center mx-auto mb-3">
-              <FileText size={28} className="text-orange-600" />
-            </div>
+          <div className="col-span-full card p-10 text-center">
+            <div className="icon-square mx-auto mb-3"><FileText size={20} /></div>
             <p className="font-display text-xl font-bold text-slate-900">No materials yet</p>
             <p className="text-slate-500 mt-1 text-sm">Upload your first PDF or paste notes to ground the AI.</p>
           </div>
         )}
         {items.map((m) => (
-          <div key={m.material_id} className="bg-white rounded-2xl p-4 shadow-md flex items-start gap-3 group">
-            <div className="w-12 h-12 rounded-xl bg-[#E0E7FF] flex items-center justify-center shrink-0">
-              <FileText size={22} className="text-[#1D4ED8]" />
-            </div>
+          <div key={m.material_id} className="card p-4 flex items-start gap-3 group hover:-translate-y-0.5 transition-transform">
+            <span className="icon-square shrink-0" style={{ width: 44, height: 44 }}>
+              <FileText size={18} strokeWidth={2.4} />
+            </span>
             <div className="min-w-0 flex-1">
               <div className="font-bold text-slate-900 truncate">{m.title}</div>
               <div className="text-xs text-slate-500 mt-0.5">
@@ -155,7 +137,7 @@ export default function MaterialsTab({ subjectId }) {
               data-testid={`material-delete-${m.material_id}`}
               className="p-2 rounded-full text-slate-400 hover:text-red-600 hover:bg-red-50 opacity-0 group-hover:opacity-100 transition"
             >
-              <Trash2 size={16} />
+              <Trash2 size={14} />
             </button>
           </div>
         ))}

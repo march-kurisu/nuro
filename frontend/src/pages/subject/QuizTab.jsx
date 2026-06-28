@@ -31,12 +31,12 @@ export default function QuizTab({ subjectId }) {
     try {
       const { data } = await api.post(`/quiz/answer`, { quiz_id: quiz.quiz_id, selected_index: selected });
       setResult(data);
-    } catch (e) { toast.error("Submit failed"); }
+    } catch { toast.error("Submit failed"); }
   };
 
   return (
     <div className="space-y-5 max-w-3xl mx-auto">
-      <div className="bg-white rounded-[2rem] p-6 shadow-xl flex flex-wrap items-center justify-between gap-3">
+      <div className="card p-6 flex flex-wrap items-center justify-between gap-3">
         <div>
           <h3 className="font-display text-2xl font-bold text-slate-900">Adaptive Quiz</h3>
           <p className="text-slate-500 text-sm">We pick your weakest topic — answer to level up mastery.</p>
@@ -54,21 +54,16 @@ export default function QuizTab({ subjectId }) {
               >{d}</button>
             ))}
           </div>
-          <button
-            data-testid="quiz-generate-btn"
-            onClick={generate}
-            disabled={busy}
-            className="px-5 py-3 rounded-full bg-[#C5E92E] text-slate-900 font-bold inline-flex items-center gap-2 hover:-translate-y-0.5 transition-transform disabled:opacity-50"
-          >
-            <Sparkles size={16} /> {busy ? "Generating…" : "Next question"}
+          <button data-testid="quiz-generate-btn" onClick={generate} disabled={busy} className="btn-yellow disabled:opacity-50">
+            <Sparkles size={14} /> {busy ? "Generating…" : "Next question"}
           </button>
         </div>
       </div>
 
       {!quiz && (
-        <div className="bg-white rounded-[2rem] p-12 shadow-xl text-center">
-          <div className="w-20 h-20 rounded-full bg-[#FEF9C3] flex items-center justify-center mx-auto mb-3 float-anim">
-            <Sparkles size={36} className="text-yellow-600" />
+        <div className="card p-12 text-center">
+          <div className="icon-square mx-auto mb-3 float-anim" style={{ width: 56, height: 56, borderRadius: 16 }}>
+            <Sparkles size={26} strokeWidth={2.4} />
           </div>
           <p className="font-display text-2xl font-bold text-slate-900">Ready when you are</p>
           <p className="text-slate-500 mt-1">Generate a question to start your adaptive session.</p>
@@ -76,8 +71,7 @@ export default function QuizTab({ subjectId }) {
       )}
 
       {quiz && (
-        <div className="bg-white rounded-[2rem] p-7 shadow-xl fade-up relative">
-          <div className="paperclip" />
+        <div className="card p-7 fade-up">
           <div className="flex items-center justify-between gap-3 mb-4">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-100 text-xs font-bold text-slate-700 uppercase tracking-widest">
               {quiz.topic || "Topic"} · {quiz.difficulty}
@@ -101,12 +95,12 @@ export default function QuizTab({ subjectId }) {
                       : isWrong
                       ? "bg-red-50 border-red-500"
                       : selected === i
-                      ? "bg-blue-50 border-[#1D4ED8]"
-                      : "bg-white border-slate-200 hover:border-[#C5E92E]"
+                      ? "bg-slate-50 border-slate-900"
+                      : "bg-white border-slate-200 hover:border-slate-900"
                   }`}
                 >
                   <div className={`w-8 h-8 rounded-full font-bold flex items-center justify-center shrink-0 ${
-                    isCorrect ? "bg-green-500 text-white" : isWrong ? "bg-red-500 text-white" : selected === i ? "bg-[#1D4ED8] text-white" : "bg-slate-100 text-slate-700"
+                    isCorrect ? "bg-green-500 text-white" : isWrong ? "bg-red-500 text-white" : selected === i ? "bg-slate-900 text-white" : "bg-slate-100 text-slate-700"
                   }`}>
                     {isCorrect ? <Check size={16} /> : isWrong ? <X size={16} /> : String.fromCharCode(65 + i)}
                   </div>
@@ -117,30 +111,21 @@ export default function QuizTab({ subjectId }) {
           </div>
 
           {!result && (
-            <button
-              data-testid="quiz-submit-btn"
-              disabled={selected === null}
-              onClick={submit}
-              className="mt-5 px-6 py-3 rounded-full bg-[#1D4ED8] text-white font-bold inline-flex items-center gap-2 hover:-translate-y-0.5 transition-transform disabled:opacity-40"
-            >Submit answer <ArrowRight size={16} /></button>
+            <button data-testid="quiz-submit-btn" disabled={selected === null} onClick={submit}
+              className="mt-5 btn-dark disabled:opacity-40">
+              Submit answer <ArrowRight size={14} />
+            </button>
           )}
 
           {result && (
-            <div
-              className={`mt-5 p-5 rounded-2xl ${
-                result.correct ? "bg-green-50 border-2 border-green-200" : "bg-red-50 border-2 border-red-200"
-              }`}
-              data-testid="quiz-result"
-            >
+            <div className={`mt-5 p-5 rounded-2xl ${result.correct ? "bg-green-50 border-2 border-green-200" : "bg-red-50 border-2 border-red-200"}`} data-testid="quiz-result">
               <div className={`font-display text-xl font-bold ${result.correct ? "text-green-700" : "text-red-700"}`}>
-                {result.correct ? "🎉 Correct!" : "Not quite."}
+                {result.correct ? "Correct!" : "Not quite."}
               </div>
               <p className="mt-1 text-slate-700 text-sm leading-relaxed">{result.explanation}</p>
-              <button
-                onClick={generate}
-                data-testid="quiz-next-btn"
-                className="mt-4 px-5 py-2.5 rounded-full bg-slate-900 text-white font-bold inline-flex items-center gap-2 hover:-translate-y-0.5 transition-transform"
-              >Next question <ArrowRight size={16} /></button>
+              <button onClick={generate} data-testid="quiz-next-btn" className="mt-4 btn-dark">
+                Next question <ArrowRight size={14} />
+              </button>
             </div>
           )}
         </div>

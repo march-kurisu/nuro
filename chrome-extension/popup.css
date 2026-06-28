@@ -4,7 +4,7 @@ html, body { width: 380px; height: 600px; font-family: 'Nunito', system-ui, sans
 
 #root { width: 100%; height: 100%; display: flex; flex-direction: column; }
 .header { background: #0F172A; color: #fff; padding: 14px 16px; display: flex; align-items: center; gap: 12px; }
-.logo { width: 36px; height: 36px; border-radius: 999px; background: #C5E92E; display: flex; align-items: center; justify-content: center; font-size: 18px; }
+.logo { width: 36px; height: 36px; border-radius: 10px; background: #E4F222; display: flex; align-items: center; justify-content: center; font-size: 18px; color: #0F172A; font-weight: 700; }
 .brand { flex: 1; min-width: 0; }
 .brand .name { font-family: 'Fredoka'; font-weight: 700; font-size: 16px; }
 .brand .sub { font-size: 11px; color: rgba(255,255,255,0.6); margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -22,7 +22,7 @@ select, input { font-family: inherit; }
 .muted { font-size: 11px; color: #64748B; margin-top: 2px; }
 
 .toggle { position: relative; width: 46px; height: 26px; border-radius: 999px; border: 0; cursor: pointer; transition: background 0.2s; }
-.toggle.on { background: #C5E92E; }
+.toggle.on { background: #E4F222; }
 .toggle.off { background: #CBD5E1; }
 .toggle .knob { position: absolute; top: 3px; width: 20px; height: 20px; border-radius: 999px; background: #fff; box-shadow: 0 1px 4px rgba(0,0,0,0.2); transition: left 0.2s; }
 .toggle.on .knob { left: 23px; }
@@ -49,7 +49,7 @@ select, input { font-family: inherit; }
 .setup p { font-size: 12px; color: #64748B; line-height: 1.5; }
 .setup input { width: 100%; padding: 10px 14px; border-radius: 999px; border: 2px solid #E2E8F0; background: #F8FAFC; font-size: 12px; outline: none; }
 .setup input:focus { border-color: #1D4ED8; background: #fff; }
-.btn { padding: 10px 16px; border-radius: 999px; border: 0; background: #C5E92E; color: #0F172A; font-weight: 700; font-size: 13px; cursor: pointer; }
+.btn { padding: 10px 16px; border-radius: 999px; border: 0; background: #E4F222; color: #0F172A; font-weight: 700; font-size: 13px; cursor: pointer; }
 .btn.dark { background: #0F172A; color: #fff; }
 .btn:disabled { opacity: 0.5; cursor: not-allowed; }
 .error { background: #FEE2E2; color: #B91C1C; padding: 8px 12px; border-radius: 12px; font-size: 12px; }
