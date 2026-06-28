@@ -1,64 +1,96 @@
 # Nuro · Living Learning Ecosystem — PRD
 
 ## Original Problem Statement
-User uploaded `HACKATHON_Ide Pertama Guwe.docx` describing a "Living Learning Ecosystem" — an AI-powered, personalized learning platform paired with a contextual browser extension. The user requested: dashboard + Chrome extension, all 4 AI features (curriculum, RAG chat, adaptive quiz, focus nudge), Claude Sonnet 4.5 via Emergent Universal LLM Key, Google + email/password auth. A Videmy-inspired UI design reference (clean white, yellow accent, dark pill buttons) was provided in iteration 2.
+User uploaded `HACKATHON_Ide Pertama Guwe.docx` describing a "Living Learning Ecosystem" — an AI-powered, personalized learning platform paired with a Chrome extension. User chose: dashboard + extension, all 4 AI features, Claude Sonnet 4.5 via Emergent Universal Key, Google + email/password auth, Videmy-inspired UI (white/yellow). Iteration 3 feedback: fix markdown in chat, calendar view for curriculum, force structured learning order, fix extension download.
 
 ## Architecture
-- **Backend**: FastAPI + MongoDB (Motor). `/app/backend/server.py` exposes all `/api/*` routes.
-- **Frontend**: React 19 + React Router + Tailwind. `/app/frontend/src/` with pages, components, hooks.
-- **LLM**: Claude Sonnet 4.5 (`claude-sonnet-4-5-20250929`) via `emergentintegrations` library + `EMERGENT_LLM_KEY`.
-- **RAG**: Simple in-process TF-style keyword retrieval over MongoDB-stored chunks; top-k passed in Claude system prompt.
-- **Auth**: DB-backed `session_token` (Bearer). Two flows produce same token: email/password (bcrypt) and Emergent Google OAuth (session_id exchange).
-- **Chrome Extension**: Manifest V3 in `/app/chrome-extension/` — vanilla JS popup + service worker for focus events.
-
-## User Personas
-- Self-directed students (middle school → undergrad) preparing for exams from their own materials.
-- Hackathon demo audience evaluating end-to-end depth.
+- **Backend**: FastAPI + MongoDB (Motor). `/app/backend/server.py`
+- **Frontend**: React 19 + React Router + Tailwind. `/app/frontend/src/`
+- **LLM**: Claude Sonnet 4.5 via `emergentintegrations` + `EMERGENT_LLM_KEY`
+- **RAG**: Keyword TF retrieval over chunked materials, top-k passed in Claude system prompt
+- **Auth**: DB session_token (Bearer). Email/pass (bcrypt) + Emergent Google OAuth
+- **Chrome Extension**: MV3 in `/app/chrome-extension/`, downloadable as .zip via `/api/extension/download`
 
 ## Core Requirements
-- Multi-subject workspace with materials ingestion (PDF/text)
-- AI study chat grounded in user's materials (streaming SSE)
-- AI curriculum generator (goal + weeks + hours → weekly plan + topic seeds)
+- Multi-subject workspace + materials ingestion (PDF/text)
+- AI study chat grounded in materials, streaming SSE, **markdown rendered**
+- AI curriculum on a **full calendar** (date-aware tasks with time slots + AI-suggested schedule)
 - Adaptive quiz generator with mastery tracking
-- Mastery map visualization (per-topic proficiency 0-100)
-- Dashboard with stats + 14-day study heatmap + streak
-- Chrome extension: active subject picker + focus toggle + mini RAG chat
-- Clean, modern Videmy-inspired design (white + yellow accent + dark CTA)
+- **Structured learning path**: diagnostic survey → ordered modules (foundation → intermediate → advanced) with **forced progression** (70% to unlock next)
+- Dashboard with stats + heatmap + streak
+- Chrome extension with focus mode + mini RAG chat
+- Clean Videmy-inspired design
 
-## What's Implemented (2026-01)
-- ✅ Email/password auth (register, login, /me, logout) + Emergent Google OAuth session exchange
-- ✅ Subjects full CRUD with cascade delete
-- ✅ Materials: text paste + file upload (PDF via pypdf, txt/md), chunking, indexing
-- ✅ Streaming RAG chat with source citations (SSE: `sources`, `session`, `delta`, `done`)
-- ✅ Chat history persistence per subject/session
-- ✅ Curriculum generator (Claude → strict JSON plan, seeds mastery topics)
-- ✅ Adaptive quiz generator (picks weakest topic, 4-option MCQ, no answer leak)
-- ✅ Quiz answer + mastery update (proficiency computed from correct/attempts)
-- ✅ Dashboard summary endpoint (subjects, quizzes, accuracy, streak, heatmap, overall mastery)
-- ✅ Focus events endpoint + stats (for extension)
-- ✅ Frontend: Landing, Login, Register, AuthCallback, Dashboard, Subjects list, Subject detail (5 tabs), Extension preview
-- ✅ Chrome extension (Manifest V3): popup, background service worker, focus tab tracking, icons
-- ✅ Videmy-style redesign: Bricolage Grotesque + Plus Jakarta Sans, yellow #E4F222 accent, dark pill buttons, clean white surfaces, soft blue gradient hero
+## What's Implemented (current state, 2026-01)
+
+### Iteration 1 (Backend + Frontend baseline)
+- Email/password + Emergent Google OAuth
+- Subjects CRUD with cascade
+- Materials: text paste + PDF upload + chunking
+- Streaming RAG chat (SSE with sources)
+- Curriculum generator
+- Adaptive quiz + mastery
+- Dashboard summary + heatmap
+- Focus events for extension
+- Chrome extension (popup + service worker)
+
+### Iteration 2 (Videmy UI redesign)
+- Bricolage Grotesque + Plus Jakarta Sans
+- Yellow (#E4F222) accent, white surfaces, dark pill CTAs
+- All pages rebuilt: Landing, Auth, Dashboard, Subjects, Subject Detail, Extension preview
+- Fixed register bug (`_id` not JSON serializable)
+
+### Iteration 3 (Structure + Calendar + Markdown + Extension download) ✨
+- **Chat markdown**: `react-markdown` + `remark-gfm` renders headings, bold, italic, lists, code, blockquotes (no more `***` showing)
+- **Structured Learning Path** (PRIMARY tab):
+  - Onboarding survey modal (3 steps: goal → current level → weak areas)
+  - Claude generates 5-9 ordered modules (foundation → intermediate → advanced)
+  - First module unlocked; others locked
+  - Inline quiz panel per module (3 questions, 70% to pass)
+  - Pass → next module auto-unlocks
+  - Other tabs (Chat, Calendar, Free Quiz, Mastery) DISABLED until survey complete
+  - "Restart survey" option
+- **Calendar view** (Curriculum tab renamed → "Calendar"):
+  - Start date + weeks + hours/week + daily time + day-of-week selector
+  - Target deadline input
+  - **AI Suggest** button: Claude picks start_date, days, time based on goal+deadline
+  - Month grid calendar showing dated tasks with time stamps
+  - Click event to toggle done (strike-through)
+  - "Today & upcoming" panel below
+  - Previous/Next month navigation
+- **Chrome extension download** (`GET /api/extension/download` → .zip):
+  - Extension preview page now has "Download .zip" + "Copy token" + "Copy backend URL" buttons
+  - User-friendly install instructions
+- New backend endpoints:
+  - `POST /api/subjects/{id}/onboard` (survey → modules)
+  - `GET /api/subjects/{id}/modules`
+  - `POST /api/modules/{id}/complete` (score → unlock next if ≥70)
+  - `POST /api/subjects/{id}/curriculum/suggest` (AI schedule suggest)
+  - `POST /api/subjects/{id}/curriculum/event` (toggle done)
+  - `GET /api/extension/download` (zip)
 
 ## Known Issues / Backlog
-- P1 — Frontend Playwright e2e test not yet run (only landing + login + dashboard smoke-tested manually)
-- P2 — `requests.get` in `/auth/google/session` is blocking (should be `httpx.AsyncClient`)
-- P2 — `server.py` is one large file; could be split into routers
-- P2 — Quiz `correct_index` is not bounds-checked
-- P3 — No vector store (keyword retrieval only) — fine for hackathon
+- P2 — `requests.get` in `/auth/google/session` blocks event loop (use httpx.AsyncClient)
+- P2 — `server.py` is large (~1100 lines); could split into routers
+- P3 — No vector embeddings (keyword retrieval only)
+- P3 — Module quiz panel runs free-form quizzes (not strictly tied to module objectives — though `topic_hint` passes module title)
 
 ## Next Tasks
-- Run testing agent on the redesigned frontend (e2e: register → create subject → upload material → chat → curriculum → quiz → mastery)
-- Add password reset flow
-- Add streak gamification badges
-- Consider replacing keyword retrieval with sentence-transformers embeddings for better RAG
+- Run testing agent on the full new flow (onboarding → modules → calendar → markdown chat → extension download)
+- Add module-specific learning resources view (show relevant material chunks per module)
+- Optional: gamification badges, cross-subject combined calendar
 
 ## Tech Stack
-React 19, React Router 7, Tailwind 3, lucide-react, sonner (toasts), framer-motion (available), axios, FastAPI 0.110, Motor (MongoDB async), pypdf, emergentintegrations, bcrypt, PyJWT.
+React 19, React Router 7, Tailwind 3, lucide-react, sonner, react-markdown 9, remark-gfm 4, axios, FastAPI 0.110, Motor, pypdf, emergentintegrations, bcrypt, PyJWT.
 
 ## Key Files
 - `/app/backend/server.py` — all API endpoints
-- `/app/frontend/src/index.css` — design tokens (CSS vars, btn classes, card, icon-square, etc.)
-- `/app/frontend/src/lib/auth.jsx` — AuthProvider
-- `/app/frontend/src/pages/*` — page components
+- `/app/frontend/src/index.css` + `styles/prose.css` — design tokens + chat markdown styles
+- `/app/frontend/src/lib/auth.jsx`
+- `/app/frontend/src/pages/SubjectDetailPage.jsx` — tab orchestrator with lock-gate
+- `/app/frontend/src/pages/subject/PathTab.jsx` — Learning Path with module unlock
+- `/app/frontend/src/pages/subject/OnboardingModal.jsx` — diagnostic survey
+- `/app/frontend/src/pages/subject/CurriculumTab.jsx` — calendar view
+- `/app/frontend/src/pages/subject/ChatTab.jsx` — markdown chat
+- `/app/frontend/src/pages/ExtensionPreviewPage.jsx` — extension download buttons
 - `/app/chrome-extension/` — Chrome MV3 extension source

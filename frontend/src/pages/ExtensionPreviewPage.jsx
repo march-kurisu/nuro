@@ -58,22 +58,55 @@ export default function ExtensionPreviewPage() {
 
           <div className="card-dark p-8">
             <h3 className="font-display text-2xl font-bold">Install the extension</h3>
-            <p className="text-white/70 mt-2 text-sm">The extension source is bundled in your app folder.</p>
+            <p className="text-white/70 mt-2 text-sm">Download the .zip, unzip it, then load it as an unpacked extension in Chrome.</p>
             <ol className="mt-4 space-y-2 text-sm text-white/90">
-              <li><span className="font-bold text-[#E4F222]">1.</span> Copy the <code className="bg-white/10 px-2 py-0.5 rounded">/app/chrome-extension</code> folder.</li>
-              <li><span className="font-bold text-[#E4F222]">2.</span> Open <code className="bg-white/10 px-2 py-0.5 rounded">chrome://extensions</code> → toggle Developer Mode.</li>
-              <li><span className="font-bold text-[#E4F222]">3.</span> Click &quot;Load unpacked&quot; and select the folder.</li>
-              <li><span className="font-bold text-[#E4F222]">4.</span> Click the Nuro icon and paste your backend URL + token.</li>
+              <li><span className="font-bold text-[#E4F222]">1.</span> Click <b>Download .zip</b> below and unzip it on your computer.</li>
+              <li><span className="font-bold text-[#E4F222]">2.</span> Open <code className="bg-white/10 px-2 py-0.5 rounded">chrome://extensions</code> → toggle <b>Developer Mode</b> (top-right).</li>
+              <li><span className="font-bold text-[#E4F222]">3.</span> Click <b>Load unpacked</b> → select the <code className="bg-white/10 px-2 py-0.5 rounded">chrome-extension</code> folder.</li>
+              <li><span className="font-bold text-[#E4F222]">4.</span> Click the Nuro icon → paste your backend URL & session token.</li>
             </ol>
-            <a
-              href={`${process.env.REACT_APP_BACKEND_URL}/api/`}
-              className="mt-5 btn-yellow"
-              target="_blank"
-              rel="noreferrer"
-              data-testid="extension-backend-link"
-            >
-              <Download size={14} /> Get backend URL
-            </a>
+            <div className="mt-5 flex flex-wrap gap-3">
+              <a
+                href={`${process.env.REACT_APP_BACKEND_URL}/api/extension/download`}
+                className="btn-yellow"
+                data-testid="extension-download-zip"
+                download
+              >
+                <Download size={14} /> Download .zip
+              </a>
+              <button
+                data-testid="extension-copy-token"
+                onClick={async () => {
+                  const token = localStorage.getItem("lle_token") || "";
+                  try {
+                    await navigator.clipboard.writeText(token);
+                    alert("Token copied! Paste it in the extension setup.");
+                  } catch {
+                    prompt("Copy this token:", token);
+                  }
+                }}
+                className="btn-ghost"
+                style={{ background: "transparent", color: "#fff", borderColor: "rgba(255,255,255,0.2)" }}
+              >
+                Copy my token
+              </button>
+              <button
+                data-testid="extension-copy-url"
+                onClick={async () => {
+                  const url = process.env.REACT_APP_BACKEND_URL;
+                  try {
+                    await navigator.clipboard.writeText(url);
+                    alert("Backend URL copied!");
+                  } catch {
+                    prompt("Copy this URL:", url);
+                  }
+                }}
+                className="btn-ghost"
+                style={{ background: "transparent", color: "#fff", borderColor: "rgba(255,255,255,0.2)" }}
+              >
+                Copy backend URL
+              </button>
+            </div>
           </div>
         </section>
 

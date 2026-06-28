@@ -1,4 +1,6 @@
 import { useEffect, useRef, useState } from "react";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 import api, { API } from "@/lib/api";
 import { Send, Sparkles, Bot, User as UserIcon, FileText } from "lucide-react";
 
@@ -117,7 +119,17 @@ export default function ChatTab({ subjectId }) {
               </div>
             )}
             <div className={`max-w-[75%] px-4 py-3 ${m.role === "user" ? "bubble-user" : "bubble-ai"}`}>
-              <div className="whitespace-pre-wrap text-sm leading-relaxed">{m.content || (streaming ? "…" : "")}</div>
+              <div className="prose-chat">
+                {m.role === "assistant" ? (
+                  m.content ? (
+                    <ReactMarkdown remarkPlugins={[remarkGfm]}>{m.content}</ReactMarkdown>
+                  ) : (
+                    <span className="text-slate-400">{streaming ? "…" : ""}</span>
+                  )
+                ) : (
+                  <p>{m.content}</p>
+                )}
+              </div>
               {m.role === "assistant" && m.sources && m.sources.length > 0 && (
                 <div className="mt-2 pt-2 border-t border-slate-200 flex flex-wrap gap-1">
                   {m.sources.map((s, i) => (
