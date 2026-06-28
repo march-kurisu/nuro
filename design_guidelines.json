@@ -1,0 +1,103 @@
+{
+  "theme": "Light Theme with Solid Accent Backgrounds",
+  "archetype": "Archetype 6: Vibrant Play",
+  "emotion_and_vibe": "Youthful, playful, friendly, energetic. High contrast between vibrant electric blue background and clean white curved cards with lime green accents.",
+  "typography": {
+    "heading_font": "Fredoka",
+    "body_font": "Nunito",
+    "banned_fonts": ["Inter", "Roboto", "Space Grotesk", "Open Sans"],
+    "hierarchy": {
+      "h1": "text-5xl sm:text-6xl font-semibold tracking-tight leading-tight",
+      "h2": "text-3xl sm:text-4xl font-semibold tracking-tight",
+      "h3": "text-2xl font-medium",
+      "body": "text-base leading-relaxed text-slate-800",
+      "small_label": "text-sm uppercase tracking-[0.15em] font-bold text-slate-500"
+    }
+  },
+  "colors": {
+    "background": {
+      "main": "#2E7CF7",
+      "description": "Electric Blue - used for the main app background and hero areas to create high energy."
+    },
+    "surface": {
+      "card": "#FFFFFF",
+      "course_mint": "#D1FAE5",
+      "course_peach": "#FFEDD5",
+      "focus_mode": "#1E293B",
+      "description": "White for primary content cards to maintain readability. Soft pastels for subject/course cards. Dark slate for focus mode extension context."
+    },
+    "accents": {
+      "primary": "#C5E92E",
+      "primary_description": "Lime Green - used for decorative blobs, highlight shapes, and primary action buttons.",
+      "secondary": "#FF8A65",
+      "secondary_description": "Playful Orange - used for 3D illustrations, warnings, or secondary pills.",
+      "cta_blue": "#1D4ED8"
+    },
+    "text": {
+      "on_light": "#0F172A",
+      "on_dark": "#FFFFFF",
+      "muted": "#64748B"
+    }
+  },
+  "spacing_and_layout": {
+    "philosophy": "Generous, asymmetrical, and overlapping. Cards should look like stacked paper or playful widgets.",
+    "container_padding": "p-6 sm:p-8 lg:p-12",
+    "card_radius": "rounded-[2rem]",
+    "button_radius": "rounded-full",
+    "gap": "gap-6 sm:gap-8",
+    "shadows": {
+      "card": "shadow-[0_20px_50px_-12px_rgba(0,0,0,0.15)]",
+      "floating_3d": "drop-shadow-2xl"
+    }
+  },
+  "components": {
+    "cards": "White background, rounded-[2rem], massive drop shadow. Often featuring a pseudo-element or absolute positioned SVG 'paperclip' at the top. Internal padding p-8.",
+    "buttons": "Pill-shaped (rounded-full). Primary CTAs are Lime Green (#C5E92E) with Dark Text (#0F172A) or Royal Blue (#1D4ED8) with White Text. Must have translate-y-1 hover effect.",
+    "pills_and_tags": "Small rounded-full items with bright pastel backgrounds and bold text, used for 'subject category' or 'progress status'.",
+    "chrome_extension_popup": "Width 350px-400px. High density but retains the rounded-[2rem] styling. Focus mode toggles should use the Lime Green accent. Context-aware RAG chat uses soft speech bubbles.",
+    "mastery_map": "Interactive node graph visualization. Nodes should use the pastel palette (mint, peach, blue) against a clean white or deep slate background.",
+    "adaptive_quiz": "Single card layout, centered, extremely clean to avoid cognitive overload. High-contrast progress bar at the top."
+  },
+  "motion": {
+    "hover": "Playful bounce: hover:-translate-y-1 transition-transform duration-200 ease-out",
+    "entrance": "Staggered fade-up for list items/cards.",
+    "illustrations": "Slow, subtle floating animation (translate-y up and down infinitely) for 3D elements."
+  },
+  "media": {
+    "image_urls": [
+      {
+        "url": "https://images.unsplash.com/photo-1760008486699-dbc9c319691a?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjAzMjd8MHwxfHNlYXJjaHw0fHxwbGF5ZnVsJTIwM0QlMjBpbGx1c3RyYXRpb24lMjBzdHVkZW50JTIwbGVhcm5pbmclMjBjb2xvcmZ1bHxlbnwwfHx8fDE3ODI2NzA2NjN8MA&ixlib=rb-4.1.0&q=85",
+        "description": "Abstract 3D shapes floating (used as decorative sticker over UI cards)",
+        "category": "3d_decoration"
+      },
+      {
+        "url": "https://images.unsplash.com/photo-1725347740942-c5306e3c970f?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjAzMjd8MHwxfHNlYXJjaHwxfHxwbGF5ZnVsJTIwM0QlMjBpbGx1c3RyYXRpb24lMjBzdHVkZW50JTIwbGVhcm5pbmclMjBjb2xvcmZ1bHxlbnwwfHx8fDE3ODI2NzA2NjN8MA&ixlib=rb-4.1.0&q=85",
+        "description": "Colorful glass/3D object (used for empty states or hero section)",
+        "category": "hero_illustration"
+      },
+      {
+        "url": "https://images.unsplash.com/photo-1720293315630-42f6894d484e?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjAzMjd8MHwxfHNlYXJjaHwzfHxwbGF5ZnVsJTIwM0QlMjBpbGx1c3RyYXRpb24lMjBzdHVkZW50JTIwbGVhcm5pbmclMjBjb2xvcmZ1bHxlbnwwfHx8fDE3ODI2NzA2NjN8MA&ixlib=rb-4.1.0&q=85",
+        "description": "Playful set, slide, ball pit (used for dashboard welcome section background)",
+        "category": "dashboard_welcome"
+      },
+      {
+        "url": "https://images.unsplash.com/photo-1724120932024-07984b247ff1?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NTYxNzV8MHwxfHNlYXJjaHwzfHwzRCUyMHJlbmRlciUyMHF1ZXN0aW9uJTIwbWFyayUyMGNvbG9yZnVsfGVufDB8fHx8MTc4MjY3MDY2Mnww&ixlib=rb-4.1.0&q=85",
+        "description": "Colorful 3D Question marks (used for Adaptive Quiz and RAG Chat screens)",
+        "category": "quiz_chat_decoration"
+      }
+    ]
+  },
+  "testing": {
+    "instructions": "All interactive and key informational elements MUST include a data-testid attribute formatted in kebab-case representing the role, e.g., data-testid='start-quiz-button' or data-testid='subject-card-math'."
+  },
+  "instructions_to_main_agent": [
+    "INSTALL FONTS: Ensure you include Google Fonts for 'Fredoka' and 'Nunito' in the index.html or global css.",
+    "INSTALL ICONS: Use 'lucide-react' for clean UI icons, but scale them up and add soft background circles to match the playful vibe.",
+    "BACKGROUND: The main app wrapper should have className='bg-[#2E7CF7] min-h-screen'. Do not use default white/gray backgrounds.",
+    "CARDS: All major layout blocks (workspace, dashboard panels) should be white cards with 'rounded-[2rem] shadow-xl'.",
+    "DECORATIVE ELEMENTS: Add absolute positioned <img> tags using the 3d_decoration URLs overlapping the edges of cards to recreate the 'stickers/toys' look from the reference.",
+    "PAPERCLIPS: For the 'paperclip' look requested, create a small absolute div shaped like a capsule (w-4 h-12 rounded-full border-2 border-slate-300 bg-white/50 shadow-sm) placed overlapping the top edge of subject cards to make them look attached.",
+    "CHROME EXTENSION: Build a specific route or layout mode for the extension popup (max-w-[400px] h-[600px] overflow-hidden bg-white) featuring the RAG chat and focus mode toggle prominently. Use the same rounded styles inside.",
+    "TESTING: Apply data-testid to EVERY clickable element (tabs, cards, buttons, chat inputs)."
+  ]
+}
