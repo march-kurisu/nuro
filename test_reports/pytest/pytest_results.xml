@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="22" failures="0" skipped="0" tests="25" time="1.509" timestamp="2026-06-28T18:39:04.749197+00:00" hostname="agent-env-317f1ea1-8969-4da6-877e-99aa7b98ac19"><testcase classname="tests.backend_test" name="test_health" time="0.197" /><testcase classname="tests.backend_test" name="test_protected_endpoints_require_auth" time="0.319" /><testcase classname="tests.backend_test.TestAuth" name="test_login_works" time="0.421"><error message="failed on setup with &quot;AssertionError: register failed: 500 Internal Server Error&#10;assert 500 == 200&#10; +  where 500 = &lt;Response [500]&gt;.status_code&quot;">backend/tests/backend_test.py:37: in auth
+    assert r.status_code == 200, f"register failed: {r.status_code} {r.text}"
+E   AssertionError: register failed: 500 Internal Server Error
+E   assert 500 == 200
+E    +  where 500 = &lt;Response [500]&gt;.status_code</error></testcase><testcase classname="tests.backend_test.TestAuth" name="test_duplicate_register" time="0.000"><error message="failed on setup with &quot;AssertionError: register failed: 500 Internal Server Error&#10;assert 500 == 200&#10; +  where 500 = &lt;Response [500]&gt;.status_code&quot;">backend/tests/backend_test.py:37: in auth
+    assert r.status_code == 200, f"register failed: {r.status_code} {r.text}"
+E   AssertionError: register failed: 500 Internal Server Error
+E   assert 500 == 200
+E    +  where 500 = &lt;Response [500]&gt;.status_code</error></testcase><testcase classname="tests.backend_test.TestAuth" name="test_me" time="0.000"><error message="failed on setup with &quot;AssertionError: register failed: 500 Internal Server Error&#10;assert 500 == 200&#10; +  where 500 = &lt;Response [500]&gt;.status_code&quot;">backend/tests/backend_test.py:37: in auth
+    assert r.status_code == 200, f"register failed: {r.status_code} {r.text}"
+E   AssertionError: register failed: 500 Internal Server Error
+E   assert 500 == 200
+E    +  where 500 = &lt;Response [500]&gt;.status_code</error></testcase><testcase classname="tests.backend_test.TestAuth" name="test_me_unauthorized" time="0.082" /><testcase classname="tests.backend_test.TestAuth" name="test_invalid_login" time="0.000"><error message="failed on setup with &quot;AssertionError: register failed: 500 Internal Server Error&#10;assert 500 == 200&#10; +  where 500 = &lt;Response [500]&gt;.status_code&quot;">backend/tests/backend_test.py:37: in auth
+    assert r.status_code == 200, f"register failed: {r.status_code} {r.text}"
+E   AssertionError: register failed: 500 Internal Server Error
+E   assert 500 == 200
+E    +  where 500 = &lt;Response [500]&gt;.status_code</error></testcase><testcase classname="tests.backend_test.TestSubjects" name="test_create_subject" time="0.000"><error message="failed on setup with &quot;AssertionError: register failed: 500 Internal Server Error&#10;assert 500 == 200&#10; +  where 500 = &lt;Response [500]&gt;.status_code&quot;">backend/tests/backend_test.py:37: in auth
+    assert r.status_code == 200, f"register failed: {r.status_code} {r.text}"
+E   AssertionError: register failed: 500 Internal Server Error
+E   assert 500 == 200
+E    +  where 500 = &lt;Response [500]&gt;.status_code</error></testcase><testcase classname="tests.backend_test.TestSubjects" name="test_list_subjects" time="0.000"><error message="failed on setup with &quot;AssertionError: register failed: 500 Internal Server Error&#10;assert 500 == 200&#10; +  where 500 = &lt;Response [500]&gt;.status_code&quot;">backend/tests/backend_test.py:37: in auth
+    assert r.status_code == 200, f"register failed: {r.status_code} {r.text}"
+E   AssertionError: register failed: 500 Internal Server Error
+E   assert 500 == 200
+E    +  where 500 = &lt;Response [500]&gt;.status_code</error></testcase><testcase classname="tests.backend_test.TestSubjects" name="test_update_subject" time="0.000"><error message="failed on setup with &quot;AssertionError: register failed: 500 Internal Server Error&#10;assert 500 == 200&#10; +  where 500 = &lt;Response [500]&gt;.status_code&quot;">backend/tests/backend_test.py:37: in auth
+    assert r.status_code == 200, f"register failed: {r.status_code} {r.text}"
+E   AssertionError: register failed: 500 Internal Server Error
+E   assert 500 == 200
+E    +  where 500 = &lt;Response [500]&gt;.status_code</error></testcase><testcase classname="tests.backend_test.TestQuiz" name="test_generate_quiz" time="0.000"><error message="failed on setup with &quot;AssertionError: register failed: 500 Internal Server Error&#10;assert 500 == 200&#10; +  where 500 = &lt;Response [500]&gt;.status_code&quot;">backend/tests/backend_test.py:37: in auth
+    assert r.status_code == 200, f"register failed: {r.status_code} {r.text}"
+E   AssertionError: register failed: 500 Internal Server Error
+E   assert 500 == 200
+E    +  where 500 = &lt;Response [500]&gt;.status_code</error></testcase><testcase classname="tests.backend_test.TestQuiz" name="test_answer_quiz" time="0.000"><error message="failed on setup with &quot;AssertionError: register failed: 500 Internal Server Error&#10;assert 500 == 200&#10; +  where 500 = &lt;Response [500]&gt;.status_code&quot;">backend/tests/backend_test.py:37: in auth
+    assert r.status_code == 200, f"register failed: {r.status_code} {r.text}"
+E   AssertionError: register failed: 500 Internal Server Error
+E   assert 500 == 200
+E    +  where 500 = &lt;Response [500]&gt;.status_code</error></testcase><testcase classname="tests.backend_test.TestQuiz" name="test_answer_twice_fails" time="0.000"><error message="failed on setup with &quot;AssertionError: register failed: 500 Internal Server Error&#10;assert 500 == 200&#10; +  where 500 = &lt;Response [500]&gt;.status_code&quot;">backend/tests/backend_test.py:37: in auth
+    assert r.status_code == 200, f"register failed: {r.status_code} {r.text}"
+E   AssertionError: register failed: 500 Internal Server Error
+E   assert 500 == 200
+E    +  where 500 = &lt;Response [500]&gt;.status_code</error></testcase><testcase classname="tests.backend_test.TestRAGChat" name="test_chat_stream" time="0.000"><error message="failed on setup with &quot;AssertionError: register failed: 500 Internal Server Error&#10;assert 500 == 200&#10; +  where 500 = &lt;Response [500]&gt;.status_code&quot;">backend/tests/backend_test.py:37: in auth
+    assert r.status_code == 200, f"register failed: {r.status_code} {r.text}"
+E   AssertionError: register failed: 500 Internal Server Error
+E   assert 500 == 200
+E    +  where 500 = &lt;Response [500]&gt;.status_code</error></testcase><testcase classname="tests.backend_test.TestRAGChat" name="test_chat_history" time="0.000"><error message="failed on setup with &quot;AssertionError: register failed: 500 Internal Server Error&#10;assert 500 == 200&#10; +  where 500 = &lt;Response [500]&gt;.status_code&quot;">backend/tests/backend_test.py:37: in auth
+    assert r.status_code == 200, f"register failed: {r.status_code} {r.text}"
+E   AssertionError: register failed: 500 Internal Server Error
+E   assert 500 == 200
+E    +  where 500 = &lt;Response [500]&gt;.status_code</error></testcase><testcase classname="tests.backend_test.TestCurriculum" name="test_generate_curriculum" time="0.000"><error message="failed on setup with &quot;AssertionError: register failed: 500 Internal Server Error&#10;assert 500 == 200&#10; +  where 500 = &lt;Response [500]&gt;.status_code&quot;">backend/tests/backend_test.py:37: in auth
+    assert r.status_code == 200, f"register failed: {r.status_code} {r.text}"
+E   AssertionError: register failed: 500 Internal Server Error
+E   assert 500 == 200
+E    +  where 500 = &lt;Response [500]&gt;.status_code</error></testcase><testcase classname="tests.backend_test.TestCurriculum" name="test_get_curriculum" time="0.000"><error message="failed on setup with &quot;AssertionError: register failed: 500 Internal Server Error&#10;assert 500 == 200&#10; +  where 500 = &lt;Response [500]&gt;.status_code&quot;">backend/tests/backend_test.py:37: in auth
+    assert r.status_code == 200, f"register failed: {r.status_code} {r.text}"
+E   AssertionError: register failed: 500 Internal Server Error
+E   assert 500 == 200
+E    +  where 500 = &lt;Response [500]&gt;.status_code</error></testcase><testcase classname="tests.backend_test.TestFocus" name="test_focus_event" time="0.000"><error message="failed on setup with &quot;AssertionError: register failed: 500 Internal Server Error&#10;assert 500 == 200&#10; +  where 500 = &lt;Response [500]&gt;.status_code&quot;">backend/tests/backend_test.py:37: in auth
+    assert r.status_code == 200, f"register failed: {r.status_code} {r.text}"
+E   AssertionError: register failed: 500 Internal Server Error
+E   assert 500 == 200
+E    +  where 500 = &lt;Response [500]&gt;.status_code</error></testcase><testcase classname="tests.backend_test.TestFocus" name="test_focus_stats" time="0.000"><error message="failed on setup with &quot;AssertionError: register failed: 500 Internal Server Error&#10;assert 500 == 200&#10; +  where 500 = &lt;Response [500]&gt;.status_code&quot;">backend/tests/backend_test.py:37: in auth
+    assert r.status_code == 200, f"register failed: {r.status_code} {r.text}"
+E   AssertionError: register failed: 500 Internal Server Error
+E   assert 500 == 200
+E    +  where 500 = &lt;Response [500]&gt;.status_code</error></testcase><testcase classname="tests.backend_test.TestMastery" name="test_mastery_seeded" time="0.000"><error message="failed on setup with &quot;AssertionError: register failed: 500 Internal Server Error&#10;assert 500 == 200&#10; +  where 500 = &lt;Response [500]&gt;.status_code&quot;">backend/tests/backend_test.py:37: in auth
+    assert r.status_code == 200, f"register failed: {r.status_code} {r.text}"
+E   AssertionError: register failed: 500 Internal Server Error
+E   assert 500 == 200
+E    +  where 500 = &lt;Response [500]&gt;.status_code</error></testcase><testcase classname="tests.backend_test" name="test_dashboard_summary" time="0.350"><error message="failed on setup with &quot;AssertionError: register failed: 500 Internal Server Error&#10;assert 500 == 200&#10; +  where 500 = &lt;Response [500]&gt;.status_code&quot;">backend/tests/backend_test.py:37: in auth
+    assert r.status_code == 200, f"register failed: {r.status_code} {r.text}"
+E   AssertionError: register failed: 500 Internal Server Error
+E   assert 500 == 200
+E    +  where 500 = &lt;Response [500]&gt;.status_code</error></testcase><testcase classname="tests.backend_test" name="test_zzz_delete_subject_cascade" time="0.000"><error message="failed on setup with &quot;AssertionError: register failed: 500 Internal Server Error&#10;assert 500 == 200&#10; +  where 500 = &lt;Response [500]&gt;.status_code&quot;">backend/tests/backend_test.py:37: in auth
+    assert r.status_code == 200, f"register failed: {r.status_code} {r.text}"
+E   AssertionError: register failed: 500 Internal Server Error
+E   assert 500 == 200
+E    +  where 500 = &lt;Response [500]&gt;.status_code</error></testcase><testcase classname="tests.backend_test.TestMaterials" name="test_add_text_material" time="0.000"><error message="failed on setup with &quot;AssertionError: register failed: 500 Internal Server Error&#10;assert 500 == 200&#10; +  where 500 = &lt;Response [500]&gt;.status_code&quot;">backend/tests/backend_test.py:37: in auth
+    assert r.status_code == 200, f"register failed: {r.status_code} {r.text}"
+E   AssertionError: register failed: 500 Internal Server Error
+E   assert 500 == 200
+E    +  where 500 = &lt;Response [500]&gt;.status_code</error></testcase><testcase classname="tests.backend_test.TestMaterials" name="test_upload_text_file" time="0.000"><error message="failed on setup with &quot;AssertionError: register failed: 500 Internal Server Error&#10;assert 500 == 200&#10; +  where 500 = &lt;Response [500]&gt;.status_code&quot;">backend/tests/backend_test.py:37: in auth
+    assert r.status_code == 200, f"register failed: {r.status_code} {r.text}"
+E   AssertionError: register failed: 500 Internal Server Error
+E   assert 500 == 200
+E    +  where 500 = &lt;Response [500]&gt;.status_code</error></testcase><testcase classname="tests.backend_test.TestMaterials" name="test_list_materials" time="0.000"><error message="failed on setup with &quot;AssertionError: register failed: 500 Internal Server Error&#10;assert 500 == 200&#10; +  where 500 = &lt;Response [500]&gt;.status_code&quot;">backend/tests/backend_test.py:37: in auth
+    assert r.status_code == 200, f"register failed: {r.status_code} {r.text}"
+E   AssertionError: register failed: 500 Internal Server Error
+E   assert 500 == 200
+E    +  where 500 = &lt;Response [500]&gt;.status_code</error></testcase></testsuite></testsuites>
