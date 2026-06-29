@@ -30,7 +30,7 @@ from starlette.middleware.cors import CORSMiddleware
 from motor.motor_asyncio import AsyncIOMotorClient
 from pypdf import PdfReader
 
-from emergentintegrations.llm.chat import LlmChat, UserMessage, TextDelta, StreamDone
+import anthropic
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / ".env")
@@ -1207,7 +1207,7 @@ class VisualizeIn(BaseModel):
 async def visualize(body: VisualizeIn, user=Depends(require_user)):
     """Generate an educational diagram/illustration from text."""
     try:
-        from emergentintegrations.llm.chat import LlmChat as _LlmChat, UserMessage as _UM
+        import anthropic as _anthropic
         chat = _LlmChat(
             api_key=EMERGENT_LLM_KEY,
             session_id=new_id("viz"),
