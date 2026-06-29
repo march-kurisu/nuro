@@ -114,8 +114,8 @@ export default function ChatTab({ subjectId, subjectTitle }) {
   };
 
   return (
-    <div className="card overflow-hidden flex flex-col h-[70vh]">
-      <div className="p-5 border-b border-slate-100 flex items-center gap-3 bg-slate-900 text-white">
+    <div className="card overflow-hidden flex flex-col h-[calc(100vh-180px)] min-h-[600px]">
+      <div className="p-5 border-b border-slate-100 flex items-center gap-3 bg-slate-900 text-white shrink-0">
         <span className="icon-square"><Sparkles size={18} strokeWidth={2.4} /></span>
         <div>
           <h3 className="font-display text-xl font-bold">Study chat</h3>
@@ -123,7 +123,7 @@ export default function ChatTab({ subjectId, subjectTitle }) {
         </div>
       </div>
 
-      <div className="flex-1 overflow-y-auto p-5 space-y-4 bg-app">
+      <div className="flex-1 overflow-y-auto p-5 space-y-4 bg-app min-h-0">
         {messages.length === 0 && (
           <div className="text-center py-10">
             <div className="icon-square mx-auto mb-3"><Bot size={20} /></div>
@@ -196,7 +196,7 @@ export default function ChatTab({ subjectId, subjectTitle }) {
         <div ref={endRef} />
       </div>
 
-      <form onSubmit={send} className="border-t border-slate-100 p-4 flex gap-2 bg-white">
+      <form onSubmit={send} className="border-t border-slate-100 p-4 flex gap-2 bg-white shrink-0">
         <input
           data-testid="chat-input"
           value={input}

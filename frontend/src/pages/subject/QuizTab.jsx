@@ -1,9 +1,29 @@
 import { useState } from "react";
 import api from "@/lib/api";
-import { Sparkles, Check, X, ArrowRight } from "lucide-react";
+import { Sparkles, Check, X, ArrowRight, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 
 const DIFFS = ["easy", "medium", "hard"];
+
+function QuestionSkeleton() {
+  return (
+    <div className="card p-7 fade-up" data-testid="quiz-loading">
+      <div className="flex items-center gap-2 text-slate-500 text-sm font-bold">
+        <Loader2 size={16} className="animate-spin" /> Crafting your next question…
+      </div>
+      <div className="mt-5 h-7 w-3/4 rounded-lg bg-slate-100 animate-pulse" />
+      <div className="mt-2 h-7 w-2/3 rounded-lg bg-slate-100 animate-pulse" />
+      <div className="mt-6 space-y-2">
+        {[0, 1, 2, 3].map((i) => (
+          <div key={i} className="p-4 rounded-2xl border-2 border-slate-100 flex items-center gap-3">
+            <div className="w-8 h-8 rounded-full bg-slate-100 animate-pulse shrink-0" />
+            <div className="h-4 rounded-md bg-slate-100 animate-pulse flex-1" style={{ width: `${50 + i * 10}%` }} />
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
 
 export default function QuizTab({ subjectId }) {
   const [quiz, setQuiz] = useState(null);
