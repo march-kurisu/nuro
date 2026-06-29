@@ -22,8 +22,7 @@ export default function LandingPage() {
             <span className="font-display text-2xl font-bold text-slate-900 tracking-tight">Nuro</span>
           </button>
           <nav className="hidden md:flex items-center gap-6">
-            <NavLink>Subjects</NavLink>
-            <NavLink>Features</NavLink>
+            <a href="#features" className="text-sm font-semibold text-slate-700 hover:text-slate-900">Features</a>
             <a href="#how" className="text-sm font-semibold text-slate-700 hover:text-slate-900">How it works</a>
             <a href="#pricing" className="text-sm font-semibold text-slate-700 hover:text-slate-900">Pricing</a>
           </nav>
@@ -95,7 +94,7 @@ export default function LandingPage() {
       </section>
 
       {/* Find the right skills */}
-      <section id="how" className="max-w-7xl mx-auto px-6 py-20">
+      <section id="features" className="max-w-7xl mx-auto px-6 py-20">
         <div className="text-center max-w-2xl mx-auto">
           <h2 className="font-display text-4xl sm:text-5xl font-bold text-slate-900">Find the right tools for you</h2>
           <p className="text-slate-600 mt-3">Four AI-powered modules working together — grounded in the materials you actually study.</p>
@@ -125,7 +124,7 @@ export default function LandingPage() {
       </section>
 
       {/* Recommended Learning Paths */}
-      <section className="max-w-7xl mx-auto px-6 py-16">
+      <section id="how" className="max-w-7xl mx-auto px-6 py-16">
         <div className="text-center max-w-3xl mx-auto">
           <h2 className="font-display text-4xl sm:text-5xl font-bold text-slate-900 leading-tight">Recommended Learning Paths<br />Tailored to You</h2>
           <p className="text-slate-600 mt-3">Built dynamically from your subjects, mastery map, and weak topics.</p>
