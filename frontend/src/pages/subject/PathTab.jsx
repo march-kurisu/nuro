@@ -25,7 +25,7 @@ function ModuleQuizPanel({ module, subjectId, onCompleted }) {
   const [questionsAnswered, setQuestionsAnswered] = useState(0);
   const [correctCount, setCorrectCount] = useState(0);
   const [busy, setBusy] = useState(false);
-  const TARGET_Q = 6;
+  const TARGET_Q = 15;
 
   const next = async () => {
     setBusy(true); setResult(null); setSelected(null); setQuiz(null);
