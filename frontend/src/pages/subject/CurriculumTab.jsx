@@ -37,6 +37,9 @@ export default function CurriculumTab({ subjectId }) {
   const [suggesting, setSuggesting] = useState(false);
   const [view, setView] = useState(new Date());
   const [showForm, setShowForm] = useState(true);
+  const [editEvent, setEditEvent] = useState(null); // { idx, ...fields }
+  const [addEvent, setAddEvent] = useState(null);   // { date }
+  const [confirmDelete, setConfirmDelete] = useState(null);
 
   useEffect(() => {
     (async () => {
@@ -99,6 +102,46 @@ export default function CurriculumTab({ subjectId }) {
       const updated = { ...plan, events: plan.events.map((e, i) => i === idx ? { ...e, done: !current } : e) };
       setPlan(updated);
     } catch { toast.error("Could not update"); }
+  };
+
+  const saveEdit = async () => {
+    if (!editEvent) return;
+    const { idx, date, time, task, minutes } = editEvent;
+    try {
+      const { data } = await api.patch(`/subjects/${subjectId}/curriculum/event/${idx}`, {
+        date, time, task, minutes: Number(minutes),
+      });
+      const updated = { ...plan, events: plan.events.map((e, i) => i === idx ? { ...e, ...data.event } : e) };
+      setPlan(updated);
+      setEditEvent(null);
+      toast.success("Event updated");
+    } catch { toast.error("Edit failed"); }
+  };
+
+  const handleDelete = async (idx) => {
+    try {
+      await api.delete(`/subjects/${subjectId}/curriculum/event/${idx}`);
+      const updated = { ...plan, events: plan.events.filter((_, i) => i !== idx) };
+      setPlan(updated);
+      setEditEvent(null);
+      setConfirmDelete(null);
+      toast.success("Event deleted");
+    } catch { toast.error("Delete failed"); }
+  };
+
+  const saveAdd = async () => {
+    if (!addEvent?.task?.trim()) { toast.error("Task is required"); return; }
+    try {
+      const { data } = await api.post(`/subjects/${subjectId}/curriculum/event/add`, {
+        date: addEvent.date,
+        time: addEvent.time || "18:00",
+        task: addEvent.task,
+        minutes: Number(addEvent.minutes || 45),
+      });
+      setPlan((p) => ({ ...(p || {}), events: data.events }));
+      setAddEvent(null);
+      toast.success("Event added");
+    } catch (e) { toast.error(e?.response?.data?.detail || "Could not add event"); }
   };
 
   // Group events by date

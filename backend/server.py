@@ -705,6 +705,20 @@ class EventToggleIn(BaseModel):
     done: bool
 
 
+class EventEditIn(BaseModel):
+    date: Optional[str] = None  # YYYY-MM-DD
+    time: Optional[str] = None  # HH:MM
+    task: Optional[str] = None
+    minutes: Optional[int] = Field(default=None, ge=5, le=480)
+
+
+class EventAddIn(BaseModel):
+    date: str  # YYYY-MM-DD
+    time: str = "18:00"
+    task: str
+    minutes: int = Field(default=45, ge=5, le=480)
+
+
 @api.post("/subjects/{subject_id}/curriculum/event")
 async def toggle_event(subject_id: str, body: EventToggleIn, user=Depends(require_user)):
     doc = await db.curriculum.find_one(
@@ -720,6 +734,84 @@ async def toggle_event(subject_id: str, body: EventToggleIn, user=Depends(requir
         {"curriculum_id": doc["curriculum_id"]}, {"$set": {"events": events}}
     )
     return {"ok": True}
+
+
+@api.patch("/subjects/{subject_id}/curriculum/event/{event_index}")
+async def edit_event(subject_id: str, event_index: int, body: EventEditIn, user=Depends(require_user)):
+    doc = await db.curriculum.find_one(
+        {"subject_id": subject_id, "user_id": user["user_id"]}, {"_id": 0}
+    )
+    if not doc:
+        raise HTTPException(404, "No curriculum")
+    events = doc.get("events", [])
+    if event_index < 0 or event_index >= len(events):
+        raise HTTPException(400, "Bad index")
+    update = body.model_dump(exclude_none=True)
+    events[event_index].update(update)
+    await db.curriculum.update_one(
+        {"curriculum_id": doc["curriculum_id"]}, {"$set": {"events": events}}
+    )
+    return {"ok": True, "event": events[event_index]}
+
+
+@api.delete("/subjects/{subject_id}/curriculum/event/{event_index}")
+async def delete_event(subject_id: str, event_index: int, user=Depends(require_user)):
+    doc = await db.curriculum.find_one(
+        {"subject_id": subject_id, "user_id": user["user_id"]}, {"_id": 0}
+    )
+    if not doc:
+        raise HTTPException(404, "No curriculum")
+    events = doc.get("events", [])
+    if event_index < 0 or event_index >= len(events):
+        raise HTTPException(400, "Bad index")
+    events.pop(event_index)
+    await db.curriculum.update_one(
+        {"curriculum_id": doc["curriculum_id"]}, {"$set": {"events": events}}
+    )
+    return {"ok": True}
+
+
+@api.post("/subjects/{subject_id}/curriculum/event/add")
+async def add_event(subject_id: str, body: EventAddIn, user=Depends(require_user)):
+    doc = await db.curriculum.find_one(
+        {"subject_id": subject_id, "user_id": user["user_id"]}, {"_id": 0}
+    )
+    if not doc:
+        # Create a minimal curriculum doc to host user-added events
+        doc = {
+            "curriculum_id": new_id("cur"),
+            "user_id": user["user_id"],
+            "subject_id": subject_id,
+            "goal": "",
+            "weeks": 0,
+            "hours_per_week": 0,
+            "start_date": body.date,
+            "daily_time": body.time,
+            "days_of_week": [],
+            "plan": {"weeks": [], "topics": []},
+            "events": [],
+            "created_at": now_utc().isoformat(),
+        }
+        await db.curriculum.insert_one(doc.copy())
+    new_event = {
+        "date": body.date,
+        "time": body.time,
+        "task": body.task,
+        "minutes": body.minutes,
+        "week": 0,
+        "day_label": "",
+        "focus": "Manual entry",
+        "done": False,
+        "manual": True,
+    }
+    events = list(doc.get("events", []))
+    events.append(new_event)
+    # Sort by date+time for stable indices
+    events.sort(key=lambda e: (e.get("date", ""), e.get("time", "")))
+    await db.curriculum.update_one(
+        {"curriculum_id": doc["curriculum_id"]}, {"$set": {"events": events}}
+    )
+    return {"ok": True, "events": events}
 
 
 # =====================================================================
