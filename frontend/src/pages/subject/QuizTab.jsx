@@ -60,7 +60,7 @@ export default function QuizTab({ subjectId }) {
         </div>
       </div>
 
-      {!quiz && (
+      {!quiz && !busy && (
         <div className="card p-12 text-center">
           <div className="icon-square mx-auto mb-3 float-anim" style={{ width: 56, height: 56, borderRadius: 16 }}>
             <Sparkles size={26} strokeWidth={2.4} />
@@ -70,7 +70,9 @@ export default function QuizTab({ subjectId }) {
         </div>
       )}
 
-      {quiz && (
+      {busy && <QuestionSkeleton />}
+
+      {quiz && !busy && (
         <div className="card p-7 fade-up">
           <div className="flex items-center justify-between gap-3 mb-4">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-100 text-xs font-bold text-slate-700 uppercase tracking-widest">

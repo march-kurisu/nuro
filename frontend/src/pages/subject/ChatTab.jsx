@@ -2,13 +2,15 @@ import { useEffect, useRef, useState } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import api, { API } from "@/lib/api";
-import { Send, Sparkles, Bot, User as UserIcon, FileText } from "lucide-react";
+import { Send, Sparkles, Bot, User as UserIcon, FileText, ImageIcon, Loader2 } from "lucide-react";
+import { toast } from "sonner";
 
-export default function ChatTab({ subjectId }) {
+export default function ChatTab({ subjectId, subjectTitle }) {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
   const [streaming, setStreaming] = useState(false);
   const [sessionId, setSessionId] = useState(null);
+  const [visualizing, setVisualizing] = useState(null); // msg_id being visualized
   const endRef = useRef(null);
 
   useEffect(() => {
@@ -93,13 +95,31 @@ export default function ChatTab({ subjectId }) {
     }
   };
 
+  const visualize = async (msg) => {
+    setVisualizing(msg.msg_id);
+    try {
+      const { data } = await api.post("/visualize", {
+        prompt: msg.content.slice(0, 1200),
+        subject: subjectTitle || "",
+      });
+      const imgData = `data:${data.mime_type || "image/png"};base64,${data.image_b64}`;
+      setMessages((ms) =>
+        ms.map((m) => (m.msg_id === msg.msg_id ? { ...m, image: imgData, image_caption: data.caption } : m))
+      );
+    } catch (e) {
+      toast.error(e?.response?.data?.detail || "Visual generation failed");
+    } finally {
+      setVisualizing(null);
+    }
+  };
+
   return (
     <div className="card overflow-hidden flex flex-col h-[70vh]">
       <div className="p-5 border-b border-slate-100 flex items-center gap-3 bg-slate-900 text-white">
         <span className="icon-square"><Sparkles size={18} strokeWidth={2.4} /></span>
         <div>
           <h3 className="font-display text-xl font-bold">Study chat</h3>
-          <p className="text-xs text-white/70">Grounded in your uploaded materials</p>
+          <p className="text-xs text-white/70">Grounded in your uploaded materials · Click "Visualize" for diagrams</p>
         </div>
       </div>
 
@@ -130,13 +150,39 @@ export default function ChatTab({ subjectId }) {
                   <p>{m.content}</p>
                 )}
               </div>
-              {m.role === "assistant" && m.sources && m.sources.length > 0 && (
-                <div className="mt-2 pt-2 border-t border-slate-200 flex flex-wrap gap-1">
-                  {m.sources.map((s, i) => (
-                    <span key={i} className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-white border border-slate-200 text-[10px] font-bold text-slate-600">
-                      <FileText size={10} /> {s.title} #{(s.ord || 0) + 1}
-                    </span>
-                  ))}
+
+              {/* Inline generated image */}
+              {m.image && (
+                <div className="mt-3 rounded-2xl overflow-hidden border border-slate-200 bg-white">
+                  <img src={m.image} alt="Generated visual" className="w-full block" data-testid={`chat-image-${m.msg_id}`} />
+                  {m.image_caption && <div className="px-3 py-2 text-xs text-slate-500 italic">{m.image_caption}</div>}
+                </div>
+              )}
+
+              {/* Sources + visualize action */}
+              {m.role === "assistant" && m.content && (
+                <div className="mt-2 pt-2 border-t border-slate-200 flex items-center justify-between gap-2 flex-wrap">
+                  <div className="flex flex-wrap gap-1">
+                    {(m.sources || []).map((s, i) => (
+                      <span key={i} className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-white border border-slate-200 text-[10px] font-bold text-slate-600">
+                        <FileText size={10} /> {s.title} #{(s.ord || 0) + 1}
+                      </span>
+                    ))}
+                  </div>
+                  {!m.image && (
+                    <button
+                      data-testid={`chat-visualize-${m.msg_id}`}
+                      onClick={() => visualize(m)}
+                      disabled={visualizing === m.msg_id}
+                      className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-900 text-white text-[11px] font-bold hover:-translate-y-0.5 transition-transform disabled:opacity-60"
+                    >
+                      {visualizing === m.msg_id ? (
+                        <><Loader2 size={11} className="animate-spin" /> Generating image…</>
+                      ) : (
+                        <><ImageIcon size={11} /> Visualize</>
+                      )}
+                    </button>
+                  )}
                 </div>
               )}
             </div>

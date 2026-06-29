@@ -40,7 +40,22 @@ User uploaded `HACKATHON_Ide Pertama Guwe.docx` describing a "Living Learning Ec
 - All pages rebuilt: Landing, Auth, Dashboard, Subjects, Subject Detail, Extension preview
 - Fixed register bug (`_id` not JSON serializable)
 
-### Iteration 3 (Structure + Calendar + Markdown + Extension download) ✨
+### Iteration 4 (Polish: buffering, in-app modals, visualize, longer module quizzes, more colors)
+- **Quiz buffering** — Both free Quiz and Module Quiz panels now show animated skeleton (Loader2 spinner + pulsing option placeholders) while waiting for Claude to generate the next question
+- **In-app modals replace browser popups** — New `/components/Modal.jsx` with `Modal`, `ConfirmModal`, `CopyableModal`. All `confirm()`, `alert()`, `prompt()` calls replaced:
+  - SubjectsPage delete → ConfirmModal with danger style
+  - MaterialsTab delete → ConfirmModal
+  - PathTab restart → ConfirmModal
+  - ExtensionPreviewPage copy → toast on success, CopyableModal fallback when clipboard API blocked
+- **AI image generation in chat** (Gemini Nano Banana via `gemini-3.1-flash-image-preview`):
+  - New `POST /api/visualize` endpoint accepts `{prompt, subject}` returns `{image_b64, mime_type, caption}`
+  - Each assistant message now has a "Visualize" button (only shown for AI replies)
+  - Click → loader appears in the button → returned image renders inline in the bubble with caption
+  - Tested: Newton's Laws → produced a labeled diagram with car illustration showing unbalanced force vectors
+- **Longer module check questions** — TARGET_Q increased 3 → 6, added `deep=true` flag to quiz generator that produces scenario-based 2-3 sentence questions with complete-statement options and 2-3 sentence explanations. Module quiz panel now shows progress bar (0/6) and inline buffering skeleton between questions.
+- **More subject colors** — 12 options now: yellow, mint, peach, sky, rose, violet, teal, lemon, blush, ocean, lavender, sand
+
+### Iteration 3 (Structure + Calendar + Markdown + Extension download)
 - **Chat markdown**: `react-markdown` + `remark-gfm` renders headings, bold, italic, lists, code, blockquotes (no more `***` showing)
 - **Structured Learning Path** (PRIMARY tab):
   - Onboarding survey modal (3 steps: goal → current level → weak areas)

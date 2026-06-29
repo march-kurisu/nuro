@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import api from "@/lib/api";
 import { Upload, FileText, Trash2, Plus, Type } from "lucide-react";
 import { toast } from "sonner";
+import { ConfirmModal } from "@/components/Modal";
 
 export default function MaterialsTab({ subjectId }) {
   const [items, setItems] = useState([]);
@@ -9,6 +10,7 @@ export default function MaterialsTab({ subjectId }) {
   const [showText, setShowText] = useState(false);
   const [textTitle, setTextTitle] = useState("");
   const [textContent, setTextContent] = useState("");
+  const [confirmId, setConfirmId] = useState(null);
   const fileRef = useRef(null);
 
   const load = async () => {
@@ -59,7 +61,6 @@ export default function MaterialsTab({ subjectId }) {
   };
 
   const remove = async (id) => {
-    if (!confirm("Delete this material?")) return;
     await api.delete(`/materials/${id}`);
     toast.success("Removed");
     load();
@@ -133,7 +134,7 @@ export default function MaterialsTab({ subjectId }) {
               </div>
             </div>
             <button
-              onClick={() => remove(m.material_id)}
+              onClick={() => setConfirmId(m.material_id)}
               data-testid={`material-delete-${m.material_id}`}
               className="p-2 rounded-full text-slate-400 hover:text-red-600 hover:bg-red-50 opacity-0 group-hover:opacity-100 transition"
             >
@@ -142,6 +143,16 @@ export default function MaterialsTab({ subjectId }) {
           </div>
         ))}
       </div>
+
+      <ConfirmModal
+        open={!!confirmId}
+        onClose={() => setConfirmId(null)}
+        onConfirm={() => { if (confirmId) remove(confirmId); }}
+        title="Delete this material?"
+        message="The file's indexed chunks will be removed. Chat answers may lose context from this source."
+        confirmLabel="Delete"
+        danger
+      />
     </div>
   );
 }

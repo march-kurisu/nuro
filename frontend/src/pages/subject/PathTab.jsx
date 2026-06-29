@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
 import api from "@/lib/api";
-import { Lock, Check, Play, BookOpen, ArrowRight, GraduationCap, Sparkles, RotateCcw } from "lucide-react";
+import { Lock, Check, Play, BookOpen, ArrowRight, GraduationCap, Sparkles, RotateCcw, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import OnboardingModal from "./OnboardingModal";
+import { ConfirmModal } from "@/components/Modal";
 
 const LEVEL_META = {
   foundation: { label: "Foundation", color: "#16A34A", bg: "#D1FAE5" },
@@ -24,14 +25,15 @@ function ModuleQuizPanel({ module, subjectId, onCompleted }) {
   const [questionsAnswered, setQuestionsAnswered] = useState(0);
   const [correctCount, setCorrectCount] = useState(0);
   const [busy, setBusy] = useState(false);
-  const TARGET_Q = 3;
+  const TARGET_Q = 6;
 
   const next = async () => {
-    setBusy(true); setResult(null); setSelected(null);
+    setBusy(true); setResult(null); setSelected(null); setQuiz(null);
     try {
       const { data } = await api.post(`/subjects/${subjectId}/quiz/generate`, {
         difficulty: module.level === "foundation" ? "easy" : module.level === "intermediate" ? "medium" : "hard",
         topic_hint: module.title,
+        deep: true,
       });
       setQuiz(data);
     } catch (e) {
@@ -61,21 +63,42 @@ function ModuleQuizPanel({ module, subjectId, onCompleted }) {
 
   return (
     <div className="mt-5 p-5 rounded-2xl bg-slate-50 border border-slate-200">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between flex-wrap gap-3">
         <div>
-          <div className="text-xs font-bold text-slate-500 uppercase tracking-widest">Module check</div>
-          <div className="font-bold text-slate-900 mt-1">{questionsAnswered}/{TARGET_Q} questions · {questionsAnswered ? Math.round((correctCount/questionsAnswered)*100) : 0}% correct</div>
+          <div className="text-xs font-bold text-slate-500 uppercase tracking-widest">Module check · {TARGET_Q} questions</div>
+          <div className="font-bold text-slate-900 mt-1">{questionsAnswered}/{TARGET_Q} answered · {questionsAnswered ? Math.round((correctCount/questionsAnswered)*100) : 0}% correct</div>
+          <div className="mt-2 h-1.5 rounded-full bg-slate-200 overflow-hidden w-48">
+            <div className="h-full bg-[#E4F222] rounded-full transition-all" style={{ width: `${(questionsAnswered/TARGET_Q)*100}%` }} />
+          </div>
         </div>
-        {!quiz && (
+        {!quiz && !busy && (
           <button onClick={next} disabled={busy} className="btn-yellow disabled:opacity-50" data-testid={`module-start-quiz-${module.module_id}`}>
-            <Sparkles size={14} /> {busy ? "Generating…" : "Start check"}
+            <Sparkles size={14} /> Start check
           </button>
         )}
       </div>
 
-      {quiz && (
+      {busy && (
+        <div className="mt-4" data-testid="module-quiz-loading">
+          <div className="flex items-center gap-2 text-slate-500 text-sm font-bold">
+            <Loader2 size={16} className="animate-spin" /> Crafting question {questionsAnswered + 1}…
+          </div>
+          <div className="mt-3 h-6 w-3/4 rounded bg-slate-200 animate-pulse" />
+          <div className="mt-2 h-6 w-2/3 rounded bg-slate-200 animate-pulse" />
+          <div className="mt-4 space-y-2">
+            {[0, 1, 2, 3].map((i) => (
+              <div key={i} className="p-3 rounded-xl border-2 border-slate-100 flex items-center gap-3">
+                <div className="w-7 h-7 rounded-full bg-slate-200 animate-pulse shrink-0" />
+                <div className="h-4 rounded bg-slate-200 animate-pulse" style={{ width: `${55 + i * 8}%` }} />
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {quiz && !busy && (
         <div className="mt-4">
-          <div className="font-display text-lg font-bold text-slate-900">{quiz.question}</div>
+          <div className="font-display text-lg font-bold text-slate-900 leading-snug">{quiz.question}</div>
           <div className="mt-3 space-y-2">
             {quiz.options.map((opt, i) => {
               const isCorrect = result && i === result.correct_index;
@@ -86,17 +109,17 @@ function ModuleQuizPanel({ module, subjectId, onCompleted }) {
                   disabled={!!result}
                   onClick={() => setSelected(i)}
                   data-testid={`module-quiz-opt-${i}`}
-                  className={`w-full text-left p-3 rounded-xl border-2 flex items-center gap-3 text-sm transition ${
+                  className={`w-full text-left p-3 rounded-xl border-2 flex items-start gap-3 text-sm transition ${
                     isCorrect ? "bg-green-50 border-green-500" :
                     isWrong ? "bg-red-50 border-red-500" :
                     selected === i ? "bg-white border-slate-900" :
                     "bg-white border-slate-200 hover:border-slate-400"
                   }`}
                 >
-                  <div className={`w-7 h-7 rounded-full font-bold flex items-center justify-center text-xs shrink-0 ${
+                  <div className={`w-7 h-7 rounded-full font-bold flex items-center justify-center text-xs shrink-0 mt-0.5 ${
                     isCorrect ? "bg-green-500 text-white" : isWrong ? "bg-red-500 text-white" : selected === i ? "bg-slate-900 text-white" : "bg-slate-100 text-slate-700"
                   }`}>{String.fromCharCode(65 + i)}</div>
-                  <span className="flex-1 text-slate-900">{opt}</span>
+                  <span className="flex-1 text-slate-900 leading-relaxed">{opt}</span>
                 </button>
               );
             })}
@@ -113,7 +136,7 @@ function ModuleQuizPanel({ module, subjectId, onCompleted }) {
               <div className={`font-bold ${result.correct ? "text-green-700" : "text-red-700"}`}>
                 {result.correct ? "Correct!" : "Not quite."}
               </div>
-              <p className="text-sm text-slate-700 mt-1">{result.explanation}</p>
+              <p className="text-sm text-slate-700 mt-1 leading-relaxed">{result.explanation}</p>
               <div className="mt-3 flex gap-2">
                 {questionsAnswered < TARGET_Q ? (
                   <button onClick={next} className="btn-dark text-sm" data-testid="module-quiz-next">Next question <ArrowRight size={14} /></button>
@@ -136,6 +159,7 @@ export default function PathTab({ subject, onChange }) {
   const [loading, setLoading] = useState(true);
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [activeModuleId, setActiveModuleId] = useState(null);
+  const [confirmRestart, setConfirmRestart] = useState(false);
 
   const load = async () => {
     setLoading(true);
@@ -176,11 +200,6 @@ export default function PathTab({ subject, onChange }) {
 
   const completed = modules.filter((m) => m.status === "mastered").length;
   const progress = Math.round((completed / modules.length) * 100);
-  const restart = async () => {
-    if (!confirm("Re-run the survey? Your modules will be rebuilt.")) return;
-    setModules([]);
-    setShowOnboarding(true);
-  };
 
   return (
     <div className="space-y-5">
@@ -197,7 +216,7 @@ export default function PathTab({ subject, onChange }) {
               <div className="font-display text-5xl font-bold">{progress}%</div>
               <div className="text-white/60 text-xs uppercase tracking-widest font-bold">Complete</div>
             </div>
-            <button onClick={restart} className="p-2 rounded-full bg-white/10 hover:bg-white/20" title="Restart survey" data-testid="path-restart">
+            <button onClick={() => setConfirmRestart(true)} className="p-2 rounded-full bg-white/10 hover:bg-white/20" title="Restart survey" data-testid="path-restart">
               <RotateCcw size={16} />
             </button>
           </div>
@@ -291,6 +310,16 @@ export default function PathTab({ subject, onChange }) {
           onComplete={(mods) => { setModules(mods); setShowOnboarding(false); onChange?.(); }}
         />
       )}
+
+      <ConfirmModal
+        open={confirmRestart}
+        onClose={() => setConfirmRestart(false)}
+        onConfirm={() => { setModules([]); setShowOnboarding(true); }}
+        title="Restart your learning path?"
+        message="Your current modules and progress will be rebuilt from a new survey. This can't be undone."
+        confirmLabel="Yes, restart"
+        danger
+      />
     </div>
   );
 }

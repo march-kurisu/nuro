@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import NavBar from "@/components/NavBar";
 import api from "@/lib/api";
 import { Sparkles, Bot, ShieldAlert, Send, Download, Chrome } from "lucide-react";
+import { CopyableModal } from "@/components/Modal";
+import { toast } from "sonner";
 
 export default function ExtensionPreviewPage() {
   const [subjects, setSubjects] = useState([]);
@@ -11,6 +13,22 @@ export default function ExtensionPreviewPage() {
     { role: "ai", text: "Hi! I'm tied to your current subject. Ask me anything." }
   ]);
   const [input, setInput] = useState("");
+  const [copyModal, setCopyModal] = useState({ open: false, title: "", label: "", value: "" });
+
+  const tryClipboard = async (value, label) => {
+    try {
+      await navigator.clipboard.writeText(value);
+      toast.success(`${label} copied to clipboard!`);
+    } catch {
+      // Show modal with text user can manually copy
+      setCopyModal({
+        open: true,
+        title: `Copy your ${label}`,
+        label: "Tap the text to select all, then ⌘C / Ctrl+C to copy.",
+        value,
+      });
+    }
+  };
 
   useEffect(() => {
     api.get("/subjects").then((r) => {
@@ -76,14 +94,9 @@ export default function ExtensionPreviewPage() {
               </a>
               <button
                 data-testid="extension-copy-token"
-                onClick={async () => {
+                onClick={() => {
                   const token = localStorage.getItem("lle_token") || "";
-                  try {
-                    await navigator.clipboard.writeText(token);
-                    alert("Token copied! Paste it in the extension setup.");
-                  } catch {
-                    prompt("Copy this token:", token);
-                  }
+                  tryClipboard(token, "session token");
                 }}
                 className="btn-ghost"
                 style={{ background: "transparent", color: "#fff", borderColor: "rgba(255,255,255,0.2)" }}
@@ -92,14 +105,9 @@ export default function ExtensionPreviewPage() {
               </button>
               <button
                 data-testid="extension-copy-url"
-                onClick={async () => {
+                onClick={() => {
                   const url = process.env.REACT_APP_BACKEND_URL;
-                  try {
-                    await navigator.clipboard.writeText(url);
-                    alert("Backend URL copied!");
-                  } catch {
-                    prompt("Copy this URL:", url);
-                  }
+                  tryClipboard(url, "backend URL");
                 }}
                 className="btn-ghost"
                 style={{ background: "transparent", color: "#fff", borderColor: "rgba(255,255,255,0.2)" }}
@@ -180,6 +188,14 @@ export default function ExtensionPreviewPage() {
           <p className="text-center text-slate-500 text-xs mt-3">Live mockup · the real extension lives in <code>/app/chrome-extension</code></p>
         </aside>
       </main>
+
+      <CopyableModal
+        open={copyModal.open}
+        onClose={() => setCopyModal({ ...copyModal, open: false })}
+        title={copyModal.title}
+        label={copyModal.label}
+        value={copyModal.value}
+      />
     </div>
   );
 }

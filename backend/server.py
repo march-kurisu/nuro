@@ -175,6 +175,7 @@ class ModuleCompleteIn(BaseModel):
 class QuizGenIn(BaseModel):
     difficulty: Literal["easy", "medium", "hard"] = "medium"
     topic_hint: Optional[str] = None
+    deep: bool = False  # if True, generate longer scenario-based question
 
 
 class QuizAnswerIn(BaseModel):
@@ -884,13 +885,24 @@ async def gen_quiz(subject_id: str, body: QuizGenIn, user=Depends(require_user))
     query = target_topic or s["title"]
     contexts = await retrieve_chunks(user["user_id"], subject_id, query, k=4)
     ctx_block = "\n\n".join(c["text"][:600] for c in contexts) or "(no materials)"
-    system = (
-        "You generate one multiple-choice quiz question grounded in the student's materials. "
-        "Return STRICT JSON only: "
-        "{\"question\":\"...\",\"options\":[\"A\",\"B\",\"C\",\"D\"],\"correct_index\":0,"
-        "\"explanation\":\"...\",\"topic\":\"...\"}. "
-        "Exactly 4 options. correct_index is 0-3. Difficulty must match requested level."
-    )
+    if body.deep:
+        system = (
+            "You generate ONE deep, scenario-based multiple-choice question for a learning module check. "
+            "Requirements: question MUST be at least 2-3 sentences long. Include a concrete scenario, example, or applied context. "
+            "Avoid trivial recall questions. Test understanding and reasoning. "
+            "Return STRICT JSON only: "
+            "{\"question\":\"...\",\"options\":[\"A\",\"B\",\"C\",\"D\"],\"correct_index\":0,"
+            "\"explanation\":\"2-3 sentence explanation referencing why each wrong option is wrong\",\"topic\":\"...\"}. "
+            "Exactly 4 options. Each option must be a complete, specific statement (not single words). correct_index is 0-3."
+        )
+    else:
+        system = (
+            "You generate one multiple-choice quiz question grounded in the student's materials. "
+            "Return STRICT JSON only: "
+            "{\"question\":\"...\",\"options\":[\"A\",\"B\",\"C\",\"D\"],\"correct_index\":0,"
+            "\"explanation\":\"...\",\"topic\":\"...\"}. "
+            "Exactly 4 options. correct_index is 0-3. Difficulty must match requested level."
+        )
     user_text = (
         f"Subject: {s['title']}\nDifficulty: {body.difficulty}\n"
         f"Focus topic: {target_topic or 'any core concept'}\n\n"
@@ -1089,6 +1101,50 @@ async def suggest_schedule(subject_id: str, body: ScheduleSuggestIn, user=Depend
     if "weeks" not in plan and weeks_until:
         plan["weeks"] = weeks_until
     return plan
+
+
+# =====================================================================
+# Visual generation (Gemini Nano Banana) - turns chat answers into diagrams
+# =====================================================================
+class VisualizeIn(BaseModel):
+    prompt: str
+    subject: Optional[str] = ""
+
+
+@api.post("/visualize")
+async def visualize(body: VisualizeIn, user=Depends(require_user)):
+    """Generate an educational diagram/illustration from text."""
+    try:
+        from emergentintegrations.llm.chat import LlmChat as _LlmChat, UserMessage as _UM
+        chat = _LlmChat(
+            api_key=EMERGENT_LLM_KEY,
+            session_id=new_id("viz"),
+            system_message=(
+                "You generate clear educational diagrams and illustrations. "
+                "Style: clean, labeled, white background, vibrant flat colors, minimal clutter. "
+                "Subject context: " + (body.subject or "general study")
+            ),
+        )
+        chat.with_model("gemini", "gemini-3.1-flash-image-preview").with_params(modalities=["image", "text"])
+
+        prompt = (
+            f"Create an educational illustration that explains: {body.prompt}\n"
+            "Constraints: square format, clear labels in English, simple and visually engaging."
+        )
+        text, images = await chat.send_message_multimodal_response(_UM(text=prompt))
+        if not images:
+            raise HTTPException(502, "No image was generated")
+        img = images[0]
+        return {
+            "image_b64": img["data"],
+            "mime_type": img.get("mime_type", "image/png"),
+            "caption": text or "",
+        }
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.exception("visualize failed")
+        raise HTTPException(502, f"Image generation failed: {e}")
 
 
 # =====================================================================

@@ -4,6 +4,7 @@ import NavBar from "@/components/NavBar";
 import api from "@/lib/api";
 import { Plus, BookOpen, Trash2, ArrowUpRight } from "lucide-react";
 import { toast } from "sonner";
+import { ConfirmModal } from "@/components/Modal";
 
 const COLOR_BG = {
   yellow: "#FEF3C7",
@@ -11,6 +12,13 @@ const COLOR_BG = {
   peach: "#FFEDD5",
   sky: "#E0E7FF",
   rose: "#FCE7F3",
+  violet: "#EDE9FE",
+  teal: "#CCFBF1",
+  lemon: "#ECFCCB",
+  blush: "#FFE4E6",
+  ocean: "#CFFAFE",
+  lavender: "#F3E8FF",
+  sand: "#F5F5DC",
 };
 
 export default function SubjectsPage() {
@@ -20,6 +28,7 @@ export default function SubjectsPage() {
   const [desc, setDesc] = useState("");
   const [color, setColor] = useState("yellow");
   const [params] = useSearchParams();
+  const [confirmId, setConfirmId] = useState(null);
 
   const load = async () => {
     const { data } = await api.get("/subjects");
@@ -43,7 +52,6 @@ export default function SubjectsPage() {
   };
 
   const remove = async (id) => {
-    if (!confirm("Delete this subject and all its materials?")) return;
     await api.delete(`/subjects/${id}`);
     toast.success("Subject removed");
     load();
@@ -158,6 +166,16 @@ export default function SubjectsPage() {
             </Link>
           ))}
         </section>
+
+        <ConfirmModal
+          open={!!confirmId}
+          onClose={() => setConfirmId(null)}
+          onConfirm={() => { if (confirmId) remove(confirmId); }}
+          title="Delete this subject?"
+          message="All materials, modules, curriculum, quizzes and chat history for this subject will be permanently removed."
+          confirmLabel="Delete"
+          danger
+        />
       </main>
     </div>
   );

@@ -78,7 +78,7 @@ export default function SubjectDetailPage() {
 
         <div data-testid={`tab-content-${tab}`}>
           {tab === "path" && subject && <PathTab subject={subject} onChange={() => setRefreshKey((k) => k + 1)} />}
-          {tab === "chat" && <ChatTab subjectId={id} />}
+          {tab === "chat" && <ChatTab subjectId={id} subjectTitle={subject?.title} />}
           {tab === "materials" && <MaterialsTab subjectId={id} />}
           {tab === "curriculum" && <CurriculumTab subjectId={id} />}
           {tab === "quiz" && <QuizTab subjectId={id} />}
