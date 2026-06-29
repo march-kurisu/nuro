@@ -27,11 +27,7 @@ export default function AuthPage({ mode = "login" }) {
     }
   };
 
-  const googleLogin = () => {
-    // REMINDER: DO NOT HARDCODE THE URL, OR ADD ANY FALLBACKS OR REDIRECT URLS, THIS BREAKS THE AUTH
-    const redirectUrl = window.location.origin + "/dashboard";
-    window.location.href = `https://auth.emergentagent.com/?redirect=${encodeURIComponent(redirectUrl)}`;
-  };
+  
 
   return (
     <div className="min-h-screen bg-hero">
@@ -51,15 +47,7 @@ export default function AuthPage({ mode = "login" }) {
             {isLogin ? "Continue your learning journey." : "Start your AI-powered study session."}
           </p>
 
-          <button
-            data-testid="auth-google-btn"
-            onClick={googleLogin}
-            type="button"
-            className="mt-6 btn-dark w-full justify-center text-base py-3"
-          >
-            <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#fff" d="M21.35 11.1H12v2.99h5.31c-.51 2.74-2.83 3.99-5.31 3.99c-3.31 0-6-2.69-6-6s2.69-6 6-6c1.49 0 2.84.54 3.89 1.42l2.13-2.13C16.46 3.83 14.34 3 12 3C7.03 3 3 7.03 3 12s4.03 9 9 9c4.5 0 8.59-3.28 8.59-9c0-.55-.05-1.1-.14-1.65z"/></svg>
-            Continue with Google
-          </button>
+          
 
           <div className="flex items-center my-5">
             <div className="flex-1 border-t border-slate-200" />
