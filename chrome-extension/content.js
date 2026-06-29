@@ -318,6 +318,25 @@
     state.busy = true;
     render();
 
+    // Auto-save long messages as material in parallel
+    if (text.length >= 250) {
+      const title = text.split(/[.\n!?]/, 1)[0].slice(0, 60) || `Notes ${new Date().toLocaleString()}`;
+      fetch(`${state.backendUrl}/api/subjects/${state.activeSubjectId}/materials/text`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${state.token}` },
+        body: JSON.stringify({ title, content: text }),
+      }).then(async (r) => {
+        if (r.ok) {
+          const data = await r.json();
+          state.messages.push({
+            role: "ai",
+            content: `📌 Auto-saved to materials as "${title}" (${data.chunks} chunks).`,
+          });
+          render();
+        }
+      }).catch(() => {});
+    }
+
     let acc = "";
     try {
       const resp = await fetch(`${state.backendUrl}/api/subjects/${state.activeSubjectId}/chat/stream`, {

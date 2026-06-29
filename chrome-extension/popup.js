@@ -155,6 +155,27 @@ function renderMain() {
 
   const input = document.getElementById("chatInput");
   const send = document.getElementById("sendBtn");
+
+  const autoSaveAsMaterial = async (text) => {
+    if (text.length < 250) return; // only long pastes
+    try {
+      const title = text.split(/[.\n!?]/, 1)[0].slice(0, 60) || `Notes ${new Date().toLocaleString()}`;
+      const r = await fetch(`${state.backendUrl}/api/subjects/${state.activeSubjectId}/materials/text`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${state.token}` },
+        body: JSON.stringify({ title, content: text }),
+      });
+      if (r.ok) {
+        const data = await r.json();
+        state.messages.push({
+          role: "ai",
+          content: `📌 Auto-saved this to your materials as "${title}" (${data.chunks} chunks indexed). Future answers can cite it.`,
+        });
+        render();
+      }
+    } catch {}
+  };
+
   const submit = async () => {
     const text = input.value.trim();
     if (!text || !state.activeSubjectId) return;
@@ -164,6 +185,9 @@ function renderMain() {
     render();
     const chatBox = document.getElementById("chat");
     chatBox.scrollTop = chatBox.scrollHeight;
+
+    // Auto-ingest long messages as materials in parallel
+    autoSaveAsMaterial(text);
 
     try {
       const resp = await fetch(`${state.backendUrl}/api/subjects/${state.activeSubjectId}/chat/stream`, {
