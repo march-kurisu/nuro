@@ -31,18 +31,18 @@
     body, * { font-family: 'Plus Jakarta Sans', system-ui, sans-serif; }
 
     .bubble {
-      position: fixed; width: 56px; height: 56px; border-radius: 50%;
+      position: fixed; width: 44px; height: 44px; border-radius: 50%;
       background: #E4F222; color: #0F172A;
       display: flex; align-items: center; justify-content: center;
-      box-shadow: 0 10px 30px -8px rgba(0,0,0,0.35), 0 0 0 4px rgba(228,242,34,0.18);
+      box-shadow: 0 8px 24px -6px rgba(0,0,0,0.35), 0 0 0 3px rgba(228,242,34,0.18);
       cursor: grab; border: none; touch-action: none;
       transition: transform 0.15s;
     }
     .bubble:hover { transform: scale(1.05); }
     .bubble.dragging { cursor: grabbing; transform: scale(1.08); transition: none; }
-    .bubble svg { width: 26px; height: 26px; }
+    .bubble svg { width: 20px; height: 20px; }
     .bubble .status {
-      position: absolute; bottom: -2px; right: -2px; width: 14px; height: 14px;
+      position: absolute; bottom: -1px; right: -1px; width: 11px; height: 11px;
       border-radius: 50%; background: #16A34A; border: 2px solid white;
     }
     .bubble .status.off { background: #94A3B8; }
@@ -121,7 +121,7 @@
     messages: [],
     sessionId: null,
     busy: false,
-    pos: { x: window.innerWidth - 80, y: window.innerHeight - 120 },
+    pos: { x: window.innerWidth - 64, y: window.innerHeight - 96 },
   };
 
   async function loadCfg() {
@@ -167,7 +167,7 @@
     let panelHtml = "";
     if (state.panelOpen) {
       // panel position
-      const panelX = state.pos.x + 56 > window.innerWidth - 380 ? Math.max(8, state.pos.x - 380) : state.pos.x + 64;
+      const panelX = state.pos.x + 44 > window.innerWidth - 380 ? Math.max(8, state.pos.x - 380) : state.pos.x + 52;
       const panelY = Math.max(8, Math.min(state.pos.y, window.innerHeight - 560));
       if (needsSetup) {
         panelHtml = `
@@ -243,14 +243,14 @@
         const dx = Math.abs(cx - offX - state.pos.x);
         const dy = Math.abs(cy - offY - state.pos.y);
         if (dx > 3 || dy > 3) moved = true;
-        const x = Math.max(8, Math.min(window.innerWidth - 64, cx - offX));
-        const y = Math.max(8, Math.min(window.innerHeight - 64, cy - offY));
+        const x = Math.max(8, Math.min(window.innerWidth - 52, cx - offX));
+        const y = Math.max(8, Math.min(window.innerHeight - 52, cy - offY));
         state.pos = { x, y };
         bubble.style.left = `${x}px`;
         bubble.style.top = `${y}px`;
         const panel = container.querySelector('.panel');
         if (panel) {
-          const px = x + 56 > window.innerWidth - 380 ? Math.max(8, x - 380) : x + 64;
+          const px = x + 44 > window.innerWidth - 380 ? Math.max(8, x - 380) : x + 52;
           const py = Math.max(8, Math.min(y, window.innerHeight - 560));
           panel.style.left = `${px}px`;
           panel.style.top = `${py}px`;

@@ -10,7 +10,6 @@ import SubjectsPage from "@/pages/SubjectsPage";
 import SubjectDetailPage from "@/pages/SubjectDetailPage";
 import ExtensionPreviewPage from "@/pages/ExtensionPreviewPage";
 import ProtectedRoute from "@/components/ProtectedRoute";
-import FloatingBubble from "@/components/FloatingBubble";
 
 function AppRouter() {
   const location = useLocation();
@@ -37,7 +36,6 @@ function App() {
       <AuthProvider>
         <BrowserRouter>
           <AppRouter />
-          <FloatingBubble />
           <Toaster position="top-right" richColors />
         </BrowserRouter>
       </AuthProvider>
