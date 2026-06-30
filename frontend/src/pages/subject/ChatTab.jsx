@@ -114,7 +114,7 @@ export default function ChatTab({ subjectId, subjectTitle }) {
   };
 
   return (
-    <div className="card overflow-hidden flex flex-col h-[calc(100vh-180px)] min-h-[600px]">
+    <div className="card overflow-hidden flex flex-col h-[calc(100vh-120px)] min-h-[750px]">
       <div className="p-5 border-b border-slate-100 flex items-center gap-3 bg-slate-900 text-white shrink-0">
         <span className="icon-square"><Sparkles size={18} strokeWidth={2.4} /></span>
         <div>
@@ -123,7 +123,7 @@ export default function ChatTab({ subjectId, subjectTitle }) {
         </div>
       </div>
 
-      <div className="flex-1 overflow-y-auto p-5 space-y-4 bg-app min-h-0">
+      <div className="flex-1 overflow-y-auto p-6 space-y-5 bg-app min-h-0">
         {messages.length === 0 && (
           <div className="text-center py-10">
             <div className="icon-square mx-auto mb-3"><Bot size={20} /></div>
@@ -138,7 +138,7 @@ export default function ChatTab({ subjectId, subjectTitle }) {
                 <Bot size={16} strokeWidth={2.4} />
               </div>
             )}
-            <div className={`max-w-[75%] px-4 py-3 ${m.role === "user" ? "bubble-user" : "bubble-ai"}`}>
+            <div className={`max-w-[88%] sm:max-w-[82%] px-5 py-4 ${m.role === "user" ? "bubble-user" : "bubble-ai"}`}>
               <div className="prose-chat">
                 {m.role === "assistant" ? (
                   m.content ? (

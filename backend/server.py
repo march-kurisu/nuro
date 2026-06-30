@@ -444,6 +444,24 @@ async def list_materials(subject_id: str, user=Depends(require_user)):
     return items
 
 
+@api.get("/materials/{material_id}/content")
+async def get_material_content(material_id: str, user=Depends(require_user)):
+    m = await db.materials.find_one({"material_id": material_id, "user_id": user["user_id"]}, {"_id": 0})
+    if not m:
+        raise HTTPException(404, "Material not found")
+    chunks = await db.chunks.find(
+        {"material_id": material_id, "user_id": user["user_id"]}, {"_id": 0}
+    ).sort("ord", 1).to_list(5000)
+    full_text = "".join(c["text"] for c in chunks)
+    return {
+        "material_id": material_id,
+        "title": m.get("title", "Untitled"),
+        "mime": m.get("mime", ""),
+        "char_count": m.get("char_count", len(full_text)),
+        "content": full_text,
+    }
+
+
 @api.delete("/materials/{material_id}")
 async def delete_material(material_id: str, user=Depends(require_user)):
     m = await db.materials.find_one({"material_id": material_id, "user_id": user["user_id"]}, {"_id": 0})
@@ -503,12 +521,16 @@ def build_rag_system_prompt(subject_title: str, contexts: List[dict]) -> str:
         ctx_block = "(No materials uploaded yet for this subject.)"
     return (
         f"You are an AI study coach for the subject: {subject_title}.\n"
-        f"You must ground every answer in the student's own uploaded materials shown below.\n"
-        f"- If the materials don't cover the question, say so honestly and answer briefly from general knowledge, "
-        f"clearly labeled '(general knowledge)'.\n"
+        f"Use the student's uploaded materials below as helpful context when relevant, "
+        f"but you are NOT limited to them \u2014 freely draw on your full general knowledge, "
+        f"reasoning, and any other reliable information to give the most complete and accurate answer.\n"
+        f"- If the materials are relevant, reference them naturally. If they are not relevant or insufficient, "
+        f"answer fully from general knowledge without restriction.\n"
         f"- Be concise, friendly, and ask one helpful follow-up question if useful.\n"
-        f"- Use markdown for structure, headings sparingly.\n\n"
-        f"--- STUDENT MATERIALS ---\n{ctx_block}\n--- END MATERIALS ---"
+        f"- Use markdown for structure, headings sparingly.\n"
+        f"- IMPORTANT: Always respond in the SAME language the student uses in their message. "
+        f"If they write in Indonesian, respond in Indonesian. If English, respond in English, etc.\n\n"
+        f"--- STUDENT MATERIALS (reference only, not a restriction) ---\n{ctx_block}\n--- END MATERIALS ---"
     )
 
 
@@ -594,6 +616,11 @@ async def _llm_json(system: str, user_text: str, session_id: str) -> dict:
     """Non-streaming JSON-producing helper using Groq."""
     if not groq_client:
         raise HTTPException(502, "GROQ_API_KEY not configured on server")
+    system = system + (
+        "\n\nIMPORTANT: Detect the language used in the user's input text (e.g. goal, weak areas, prompt). "
+        "Write ALL natural-language string values in the JSON output (titles, summaries, questions, explanations, "
+        "task descriptions, etc.) in that SAME language. Keep JSON keys in English as specified by the schema."
+    )
     try:
         resp = await asyncio.to_thread(
             groq_client.chat.completions.create,

@@ -12,9 +12,9 @@ import PathTab from "./subject/PathTab";
 
 const TABS = [
   { id: "path", label: "Learning Path", icon: GraduationCap, testId: "tab-path" },
-  { id: "chat", label: "Chat", icon: MessageCircle, testId: "tab-chat" },
-  { id: "materials", label: "Materials", icon: BookOpen, testId: "tab-materials" },
   { id: "curriculum", label: "Calendar", icon: Calendar, testId: "tab-curriculum" },
+  { id: "materials", label: "Materials", icon: BookOpen, testId: "tab-materials" },
+  { id: "chat", label: "Study Chat", icon: MessageCircle, testId: "tab-chat" },
   { id: "quiz", label: "Free Quiz", icon: Sparkles, testId: "tab-quiz" },
   { id: "mastery", label: "Mastery", icon: Brain, testId: "tab-mastery" },
 ];

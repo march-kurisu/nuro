@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import api from "@/lib/api";
-import { Lock, Check, Play, BookOpen, ArrowRight, GraduationCap, Sparkles, RotateCcw, Loader2 } from "lucide-react";
+import { Lock, Check, Play, BookOpen, ArrowRight, GraduationCap, Sparkles, RotateCcw, Loader2, Copy } from "lucide-react";
 import { toast } from "sonner";
 import OnboardingModal from "./OnboardingModal";
 import { ConfirmModal } from "@/components/Modal";
@@ -264,13 +264,35 @@ export default function PathTab({ subject, onChange }) {
                   <h4 className="font-display text-lg font-bold text-slate-900 mt-2">{m.title}</h4>
                   <p className="text-sm text-slate-600 mt-1">{m.summary}</p>
                   {m.objectives && m.objectives.length > 0 && isActive && (
-                    <ul className="mt-3 space-y-1">
-                      {m.objectives.map((o, j) => (
-                        <li key={j} className="text-sm text-slate-700 flex items-start gap-2">
-                          <BookOpen size={14} className="text-slate-400 mt-0.5 shrink-0" /> {o}
-                        </li>
-                      ))}
-                    </ul>
+                    <div className="mt-3">
+                      <p className="text-[11px] font-bold uppercase tracking-widest text-slate-400 mb-1.5">
+                        Submateri &mdash; klik ikon salin untuk ditempel di Materials atau Study Chat
+                      </p>
+                      <ul className="space-y-1.5">
+                        {m.objectives.map((o, j) => (
+                          <li
+                            key={j}
+                            className="text-sm text-slate-900 font-bold flex items-start justify-between gap-2 bg-slate-50 border border-slate-100 rounded-lg px-3 py-2 group"
+                          >
+                            <span className="flex items-start gap-2 flex-1">
+                              <BookOpen size={14} className="text-slate-400 mt-0.5 shrink-0" /> {o}
+                            </span>
+                            <button
+                              type="button"
+                              title="Copy submateri"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                navigator.clipboard.writeText(o);
+                                toast.success("Disalin! Tempel di Materials atau Study Chat.");
+                              }}
+                              className="shrink-0 p-1 rounded-md text-slate-400 hover:text-slate-900 hover:bg-slate-200 transition opacity-0 group-hover:opacity-100"
+                            >
+                              <Copy size={14} />
+                            </button>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
                   )}
                 </div>
 

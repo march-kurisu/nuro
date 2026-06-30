@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import api from "@/lib/api";
-import { Upload, FileText, Trash2, Plus, Type } from "lucide-react";
+import { Upload, FileText, Trash2, Plus, Type, Eye, X, Copy } from "lucide-react";
 import { toast } from "sonner";
 import { ConfirmModal } from "@/components/Modal";
 
@@ -11,6 +11,8 @@ export default function MaterialsTab({ subjectId }) {
   const [textTitle, setTextTitle] = useState("");
   const [textContent, setTextContent] = useState("");
   const [confirmId, setConfirmId] = useState(null);
+  const [viewMaterial, setViewMaterial] = useState(null); // { title, content }
+  const [loadingView, setLoadingView] = useState(false);
   const fileRef = useRef(null);
 
   const load = async () => {
@@ -64,6 +66,20 @@ export default function MaterialsTab({ subjectId }) {
     await api.delete(`/materials/${id}`);
     toast.success("Removed");
     load();
+  };
+
+  const viewContent = async (m) => {
+    setLoadingView(true);
+    setViewMaterial({ title: m.title, content: "" });
+    try {
+      const { data } = await api.get(`/materials/${m.material_id}/content`);
+      setViewMaterial({ title: data.title, content: data.content });
+    } catch {
+      toast.error("Could not load material content");
+      setViewMaterial(null);
+    } finally {
+      setLoadingView(false);
+    }
   };
 
   return (
@@ -123,23 +139,37 @@ export default function MaterialsTab({ subjectId }) {
           </div>
         )}
         {items.map((m) => (
-          <div key={m.material_id} className="card p-4 flex items-start gap-3 group hover:-translate-y-0.5 transition-transform">
+          <div
+            key={m.material_id}
+            onClick={() => viewContent(m)}
+            className="card p-4 flex items-start gap-3 group hover:-translate-y-0.5 transition-transform cursor-pointer"
+          >
             <span className="icon-square shrink-0" style={{ width: 44, height: 44 }}>
               <FileText size={18} strokeWidth={2.4} />
             </span>
             <div className="min-w-0 flex-1">
               <div className="font-bold text-slate-900 truncate">{m.title}</div>
               <div className="text-xs text-slate-500 mt-0.5">
-                {m.chunk_count} chunks · {m.char_count.toLocaleString()} chars
+                {m.chunk_count} chunks \u00b7 {m.char_count.toLocaleString()} chars
               </div>
             </div>
-            <button
-              onClick={() => setConfirmId(m.material_id)}
-              data-testid={`material-delete-${m.material_id}`}
-              className="p-2 rounded-full text-slate-400 hover:text-red-600 hover:bg-red-50 opacity-0 group-hover:opacity-100 transition"
-            >
-              <Trash2 size={14} />
-            </button>
+            <div className="flex items-center gap-1 shrink-0">
+              <button
+                onClick={(e) => { e.stopPropagation(); viewContent(m); }}
+                data-testid={`material-view-${m.material_id}`}
+                title="View content"
+                className="p-2 rounded-full text-slate-400 hover:text-slate-900 hover:bg-slate-100 opacity-0 group-hover:opacity-100 transition"
+              >
+                <Eye size={14} />
+              </button>
+              <button
+                onClick={(e) => { e.stopPropagation(); setConfirmId(m.material_id); }}
+                data-testid={`material-delete-${m.material_id}`}
+                className="p-2 rounded-full text-slate-400 hover:text-red-600 hover:bg-red-50 opacity-0 group-hover:opacity-100 transition"
+              >
+                <Trash2 size={14} />
+              </button>
+            </div>
           </div>
         ))}
       </div>
@@ -153,6 +183,35 @@ export default function MaterialsTab({ subjectId }) {
         confirmLabel="Delete"
         danger
       />
+
+      {viewMaterial && (
+        <div className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center p-4" onClick={() => setViewMaterial(null)}>
+          <div className="card p-0 w-full max-w-2xl max-h-[85vh] flex flex-col overflow-hidden" onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-center justify-between gap-3 p-5 border-b border-slate-100 shrink-0">
+              <h3 className="font-display text-lg font-bold text-slate-900 truncate">{viewMaterial.title}</h3>
+              <div className="flex items-center gap-2 shrink-0">
+                <button
+                  onClick={() => { navigator.clipboard.writeText(viewMaterial.content); toast.success("Disalin ke clipboard"); }}
+                  title="Copy all"
+                  className="p-2 rounded-full text-slate-400 hover:text-slate-900 hover:bg-slate-100"
+                >
+                  <Copy size={16} />
+                </button>
+                <button onClick={() => setViewMaterial(null)} className="p-2 rounded-full text-slate-400 hover:text-slate-900 hover:bg-slate-100">
+                  <X size={18} />
+                </button>
+              </div>
+            </div>
+            <div className="p-5 overflow-y-auto flex-1">
+              {loadingView ? (
+                <p className="text-sm text-slate-500">Loading\u2026</p>
+              ) : (
+                <p className="text-sm text-slate-700 whitespace-pre-wrap leading-relaxed">{viewMaterial.content}</p>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
