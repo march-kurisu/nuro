@@ -1264,14 +1264,11 @@ async def download_extension():
 # =====================================================================
 # Wire up
 # =====================================================================
-
-# CORS harus didaftarkan SEBELUM router
 _cors_origins_env = os.environ.get("CORS_ORIGINS", "")
 if _cors_origins_env and _cors_origins_env.strip() != "*":
     _allow_origins = [o.strip() for o in _cors_origins_env.split(",") if o.strip()]
     _allow_credentials = True
 else:
-    # Jika tidak ada env / wildcard → izinkan semua, tapi credentials=False
     _allow_origins = ["*"]
     _allow_credentials = False
 
@@ -1284,3 +1281,8 @@ app.add_middleware(
 )
 
 app.include_router(api)
+
+
+@app.on_event("shutdown")
+async def shutdown():
+    client.close()
