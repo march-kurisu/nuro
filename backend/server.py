@@ -30,7 +30,6 @@ from starlette.middleware.cors import CORSMiddleware
 from motor.motor_asyncio import AsyncIOMotorClient
 from pypdf import PdfReader
 
-import google.generativeai as genai
 from groq import Groq
 
 ROOT_DIR = Path(__file__).parent
@@ -43,11 +42,6 @@ client = AsyncIOMotorClient(MONGO_URL)
 db = client[DB_NAME]
 
 # ---------------- Config ----------------
-GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY", "")
-if GEMINI_API_KEY:
-    genai.configure(api_key=GEMINI_API_KEY)
-GEMINI_MODEL = "gemini-2.0-flash"
-
 GROQ_API_KEY = os.environ.get("GROQ_API_KEY", "")
 groq_client = Groq(api_key=GROQ_API_KEY) if GROQ_API_KEY else None
 GROQ_MODEL = "llama-3.3-70b-versatile"
