@@ -31,6 +31,7 @@ from motor.motor_asyncio import AsyncIOMotorClient
 from pypdf import PdfReader
 
 import google.generativeai as genai
+from groq import Groq
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / ".env")
@@ -46,6 +47,10 @@ GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY", "")
 if GEMINI_API_KEY:
     genai.configure(api_key=GEMINI_API_KEY)
 GEMINI_MODEL = "gemini-2.0-flash"
+
+GROQ_API_KEY = os.environ.get("GROQ_API_KEY", "")
+groq_client = Groq(api_key=GROQ_API_KEY) if GROQ_API_KEY else None
+GROQ_MODEL = "llama-3.3-70b-versatile"
 JWT_SECRET = os.environ["JWT_SECRET"]
 JWT_ALGO = "HS256"
 SESSION_DAYS = 7
@@ -540,14 +545,19 @@ async def chat_stream(subject_id: str, body: ChatIn, user=Depends(require_user))
         yield f"event: session\ndata: {json.dumps({'session_id': sid})}\n\n"
         collected = []
         try:
-            if not GEMINI_API_KEY:
-                raise RuntimeError("GEMINI_API_KEY not configured on server")
-            model = genai.GenerativeModel(GEMINI_MODEL, system_instruction=system_prompt)
-            resp_stream = await asyncio.to_thread(
-                lambda: model.generate_content(body.message, stream=True)
+            if not groq_client:
+                raise RuntimeError("GROQ_API_KEY not configured on server")
+            stream = await asyncio.to_thread(
+                groq_client.chat.completions.create,
+                model=GROQ_MODEL,
+                messages=[
+                    {"role": "system", "content": system_prompt},
+                    {"role": "user", "content": body.message},
+                ],
+                stream=True,
             )
-            for chunk in resp_stream:
-                t = chunk.text or ""
+            for chunk in stream:
+                t = chunk.choices[0].delta.content or ""
                 if t:
                     collected.append(t)
                     yield f"event: delta\ndata: {json.dumps({'t': t})}\n\n"
@@ -587,15 +597,21 @@ async def chat_history(subject_id: str, session_id: Optional[str] = None, user=D
 # Curriculum Generator
 # =====================================================================
 async def _llm_json(system: str, user_text: str, session_id: str) -> dict:
-    """Non-streaming JSON-producing helper using Gemini."""
-    if not GEMINI_API_KEY:
-        raise HTTPException(502, "GEMINI_API_KEY not configured on server")
-    model = genai.GenerativeModel(GEMINI_MODEL, system_instruction=system)
+    """Non-streaming JSON-producing helper using Groq."""
+    if not groq_client:
+        raise HTTPException(502, "GROQ_API_KEY not configured on server")
     try:
-        resp = await asyncio.to_thread(model.generate_content, user_text)
-        raw = (resp.text or "").strip()
+        resp = await asyncio.to_thread(
+            groq_client.chat.completions.create,
+            model=GROQ_MODEL,
+            messages=[
+                {"role": "system", "content": system},
+                {"role": "user", "content": user_text},
+            ],
+        )
+        raw = (resp.choices[0].message.content or "").strip()
     except Exception as e:
-        raise HTTPException(502, f"Gemini error: {e}")
+        raise HTTPException(502, f"Groq error: {e}")
     m = re.search(r"\{[\s\S]*\}", raw)
     if not m:
         raise HTTPException(502, "Model did not return JSON")
