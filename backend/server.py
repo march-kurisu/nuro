@@ -1231,7 +1231,7 @@ async def visualize(body: VisualizeIn, user=Depends(require_user)):
 # =====================================================================
 @api.get("/extension/download")
 async def download_extension():
-    ext_dir = Path("/app/chrome-extension")
+    ext_dir = ROOT_DIR.parent / "chrome-extension"
     if not ext_dir.exists():
         raise HTTPException(404, "Extension folder not found")
     buf = io.BytesIO()
