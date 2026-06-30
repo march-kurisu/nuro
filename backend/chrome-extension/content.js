@@ -24,8 +24,17 @@
 
   // ------- Styles -------
   const style = document.createElement("style");
+  const jakartaUrl400 = chrome.runtime.getURL("fonts/jakarta-400.ttf");
+  const jakartaUrl600 = chrome.runtime.getURL("fonts/jakarta-600.ttf");
+  const jakartaUrl700 = chrome.runtime.getURL("fonts/jakarta-700.ttf");
+  const bricolageUrl700 = chrome.runtime.getURL("fonts/bricolage-700.ttf");
+  const bricolageUrl800 = chrome.runtime.getURL("fonts/bricolage-800.ttf");
   style.textContent = `
-    @import url('https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
+    @font-face { font-family: 'Plus Jakarta Sans'; font-weight: 400; src: url('${jakartaUrl400}') format('truetype'); }
+    @font-face { font-family: 'Plus Jakarta Sans'; font-weight: 600; src: url('${jakartaUrl600}') format('truetype'); }
+    @font-face { font-family: 'Plus Jakarta Sans'; font-weight: 700; src: url('${jakartaUrl700}') format('truetype'); }
+    @font-face { font-family: 'Bricolage Grotesque'; font-weight: 700; src: url('${bricolageUrl700}') format('truetype'); }
+    @font-face { font-family: 'Bricolage Grotesque'; font-weight: 800; src: url('${bricolageUrl800}') format('truetype'); }
     :host, * { box-sizing: border-box; }
     .font-display { font-family: 'Bricolage Grotesque', system-ui, sans-serif; letter-spacing: -0.02em; }
     body, * { font-family: 'Plus Jakarta Sans', system-ui, sans-serif; }
