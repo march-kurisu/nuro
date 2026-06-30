@@ -314,26 +314,170 @@ export default function CurriculumTab({ subjectId }) {
                   </div>
                   <div className="mt-1 space-y-1 overflow-y-auto flex-1">
                     {evs.map((ev) => (
-                      <button
+                      <div
                         key={ev._idx}
                         data-testid={`cal-event-${ev._idx}`}
-                        onClick={() => toggleDone(ev._idx, ev.done)}
-                        className={`w-full text-left px-1.5 py-1 rounded-md text-[10px] font-semibold leading-tight transition ${
+                        onClick={() => setEditEvent({ idx: ev._idx, date: ev.date, time: ev.time, task: ev.task, minutes: ev.minutes })}
+                        className={`w-full text-left px-1.5 py-1 rounded-md text-[10px] font-semibold leading-tight transition cursor-pointer flex items-start gap-1 ${
                           ev.done ? "bg-green-100 text-green-700 line-through" : "bg-slate-900 text-white hover:bg-slate-700"
                         }`}
-                        title={`${ev.time} · ${ev.task}`}
+                        title={`${ev.time} \u00b7 ${ev.task}`}
                       >
-                        <div className="flex items-center gap-1">
-                          {ev.done && <Check size={9} />}
-                          <span className="opacity-80">{ev.time}</span>
+                        <button
+                          type="button"
+                          data-testid={`cal-event-toggle-${ev._idx}`}
+                          onClick={(e) => { e.stopPropagation(); toggleDone(ev._idx, ev.done); }}
+                          className="shrink-0 mt-[1px]"
+                        >
+                          <div className={`w-3 h-3 rounded-full border flex items-center justify-center ${ev.done ? "bg-green-500 border-green-500" : "border-white/60"}`}>
+                            {ev.done && <Check size={8} className="text-white" />}
+                          </div>
+                        </button>
+                        <div className="flex-1 min-w-0">
+                          <div className="opacity-80">{ev.time}</div>
+                          <div className="truncate">{ev.task}</div>
                         </div>
-                        <div className="truncate">{ev.task}</div>
-                      </button>
+                      </div>
                     ))}
                   </div>
+                  <button
+                    type="button"
+                    data-testid={`cal-add-${iso}`}
+                    onClick={() => setAddEvent({ date: iso, time: dailyTime || "18:00", task: "", minutes: 45 })}
+                    className="mt-1 text-[10px] font-bold text-slate-400 hover:text-slate-900 text-left"
+                  >
+                    + Add
+                  </button>
                 </div>
               );
             })}
+          </div>
+        </div>
+      )}
+
+      {/* Edit Event Modal */}
+      {editEvent && (
+        <div className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center p-4" onClick={() => setEditEvent(null)}>
+          <div className="card p-6 w-full max-w-md" onClick={(e) => e.stopPropagation()}>
+            <h3 className="font-display text-xl font-bold text-slate-900">Edit task</h3>
+            <div className="mt-4 space-y-3">
+              <div>
+                <label className="text-xs font-bold uppercase tracking-widest text-slate-500">Date</label>
+                <input
+                  data-testid="edit-event-date"
+                  type="date" value={editEvent.date}
+                  onChange={(e) => setEditEvent({ ...editEvent, date: e.target.value })}
+                  className="input mt-1"
+                />
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="text-xs font-bold uppercase tracking-widest text-slate-500">Time</label>
+                  <input
+                    data-testid="edit-event-time"
+                    type="time" value={editEvent.time}
+                    onChange={(e) => setEditEvent({ ...editEvent, time: e.target.value })}
+                    className="input mt-1"
+                  />
+                </div>
+                <div>
+                  <label className="text-xs font-bold uppercase tracking-widest text-slate-500">Minutes</label>
+                  <input
+                    data-testid="edit-event-minutes"
+                    type="number" min={5} max={480} value={editEvent.minutes}
+                    onChange={(e) => setEditEvent({ ...editEvent, minutes: e.target.value })}
+                    className="input mt-1"
+                  />
+                </div>
+              </div>
+              <div>
+                <label className="text-xs font-bold uppercase tracking-widest text-slate-500">Task / Material</label>
+                <textarea
+                  data-testid="edit-event-task"
+                  value={editEvent.task}
+                  onChange={(e) => setEditEvent({ ...editEvent, task: e.target.value })}
+                  className="input mt-1 min-h-[80px]"
+                />
+              </div>
+            </div>
+            <div className="mt-5 flex items-center justify-between">
+              <button
+                data-testid="edit-event-delete"
+                onClick={() => setConfirmDelete(editEvent.idx)}
+                className="text-red-600 text-sm font-bold hover:underline"
+              >
+                Delete task
+              </button>
+              <div className="flex gap-2">
+                <button onClick={() => setEditEvent(null)} className="btn-ghost text-sm">Cancel</button>
+                <button data-testid="edit-event-save" onClick={saveEdit} className="btn-yellow text-sm">Save</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Add Event Modal */}
+      {addEvent && (
+        <div className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center p-4" onClick={() => setAddEvent(null)}>
+          <div className="card p-6 w-full max-w-md" onClick={(e) => e.stopPropagation()}>
+            <h3 className="font-display text-xl font-bold text-slate-900">Add task &mdash; {addEvent.date}</h3>
+            <div className="mt-4 space-y-3">
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="text-xs font-bold uppercase tracking-widest text-slate-500">Time</label>
+                  <input
+                    data-testid="add-event-time"
+                    type="time" value={addEvent.time}
+                    onChange={(e) => setAddEvent({ ...addEvent, time: e.target.value })}
+                    className="input mt-1"
+                  />
+                </div>
+                <div>
+                  <label className="text-xs font-bold uppercase tracking-widest text-slate-500">Minutes</label>
+                  <input
+                    data-testid="add-event-minutes"
+                    type="number" min={5} max={480} value={addEvent.minutes}
+                    onChange={(e) => setAddEvent({ ...addEvent, minutes: e.target.value })}
+                    className="input mt-1"
+                  />
+                </div>
+              </div>
+              <div>
+                <label className="text-xs font-bold uppercase tracking-widest text-slate-500">Task / Material</label>
+                <textarea
+                  data-testid="add-event-task"
+                  value={addEvent.task}
+                  onChange={(e) => setAddEvent({ ...addEvent, task: e.target.value })}
+                  placeholder="e.g., Review Chapter 3"
+                  className="input mt-1 min-h-[80px]"
+                />
+              </div>
+            </div>
+            <div className="mt-5 flex justify-end gap-2">
+              <button onClick={() => setAddEvent(null)} className="btn-ghost text-sm">Cancel</button>
+              <button data-testid="add-event-save" onClick={saveAdd} className="btn-yellow text-sm">Add task</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Confirm Delete Modal */}
+      {confirmDelete !== null && (
+        <div className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center p-4" onClick={() => setConfirmDelete(null)}>
+          <div className="card p-6 w-full max-w-sm" onClick={(e) => e.stopPropagation()}>
+            <h3 className="font-display text-lg font-bold text-slate-900">Delete this task?</h3>
+            <p className="text-sm text-slate-500 mt-2">This action cannot be undone.</p>
+            <div className="mt-5 flex justify-end gap-2">
+              <button onClick={() => setConfirmDelete(null)} className="btn-ghost text-sm">Cancel</button>
+              <button
+                data-testid="confirm-delete-btn"
+                onClick={() => handleDelete(confirmDelete)}
+                className="px-4 py-2 rounded-full bg-red-600 text-white text-sm font-bold hover:bg-red-700"
+              >
+                Delete
+              </button>
+            </div>
           </div>
         </div>
       )}
