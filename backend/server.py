@@ -1229,6 +1229,18 @@ async def visualize(body: VisualizeIn, user=Depends(require_user)):
 # =====================================================================
 # Chrome Extension Download (.zip)
 # =====================================================================
+@api.get("/debug/paths")
+async def debug_paths():
+    import os as _os
+    return {
+        "ROOT_DIR": str(ROOT_DIR),
+        "ROOT_DIR_parent": str(ROOT_DIR.parent),
+        "ROOT_DIR_parent_contents": _os.listdir(str(ROOT_DIR.parent)) if ROOT_DIR.parent.exists() else "N/A",
+        "cwd": _os.getcwd(),
+        "cwd_contents": _os.listdir(".")
+    }
+
+
 @api.get("/extension/download")
 async def download_extension():
     ext_dir = ROOT_DIR.parent / "chrome-extension"
