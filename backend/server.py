@@ -30,7 +30,7 @@ from starlette.middleware.cors import CORSMiddleware
 from motor.motor_asyncio import AsyncIOMotorClient
 from pypdf import PdfReader
 
-import anthropic
+import google.generativeai as genai
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / ".env")
@@ -42,11 +42,13 @@ client = AsyncIOMotorClient(MONGO_URL)
 db = client[DB_NAME]
 
 # ---------------- Config ----------------
-EMERGENT_LLM_KEY = os.environ["EMERGENT_LLM_KEY"]
+GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY", "")
+if GEMINI_API_KEY:
+    genai.configure(api_key=GEMINI_API_KEY)
+GEMINI_MODEL = "gemini-2.0-flash"
 JWT_SECRET = os.environ["JWT_SECRET"]
 JWT_ALGO = "HS256"
 SESSION_DAYS = 7
-CLAUDE_MODEL = ("anthropic", "claude-sonnet-4-5-20250929")
 
 # ---------------- App ----------------
 app = FastAPI(title="Living Learning Ecosystem API")
@@ -536,19 +538,19 @@ async def chat_stream(subject_id: str, body: ChatIn, user=Depends(require_user))
         sources = [{"title": c.get("title", "Material"), "ord": c.get("ord", 0)} for c in contexts]
         yield f"event: sources\ndata: {json.dumps(sources)}\n\n"
         yield f"event: session\ndata: {json.dumps({'session_id': sid})}\n\n"
-        chat = LlmChat(
-            api_key=EMERGENT_LLM_KEY,
-            session_id=sid,
-            system_message=system_prompt,
-        ).with_model(*CLAUDE_MODEL)
         collected = []
         try:
-            async for ev in chat.stream_message(UserMessage(text=body.message)):
-                if isinstance(ev, TextDelta):
-                    collected.append(ev.content)
-                    yield f"event: delta\ndata: {json.dumps({'t': ev.content})}\n\n"
-                elif isinstance(ev, StreamDone):
-                    break
+            if not GEMINI_API_KEY:
+                raise RuntimeError("GEMINI_API_KEY not configured on server")
+            model = genai.GenerativeModel(GEMINI_MODEL, system_instruction=system_prompt)
+            resp_stream = await asyncio.to_thread(
+                lambda: model.generate_content(body.message, stream=True)
+            )
+            for chunk in resp_stream:
+                t = chunk.text or ""
+                if t:
+                    collected.append(t)
+                    yield f"event: delta\ndata: {json.dumps({'t': t})}\n\n"
         except Exception as e:
             yield f"event: error\ndata: {json.dumps({'message': str(e)})}\n\n"
         # persist assistant msg
@@ -585,20 +587,15 @@ async def chat_history(subject_id: str, session_id: Optional[str] = None, user=D
 # Curriculum Generator
 # =====================================================================
 async def _llm_json(system: str, user_text: str, session_id: str) -> dict:
-    """Non-streaming JSON-producing helper using Claude."""
-    chat = LlmChat(
-        api_key=EMERGENT_LLM_KEY,
-        session_id=session_id,
-        system_message=system,
-    ).with_model(*CLAUDE_MODEL)
-    collected = []
-    async for ev in chat.stream_message(UserMessage(text=user_text)):
-        if isinstance(ev, TextDelta):
-            collected.append(ev.content)
-        elif isinstance(ev, StreamDone):
-            break
-    raw = "".join(collected).strip()
-    # extract JSON
+    """Non-streaming JSON-producing helper using Gemini."""
+    if not GEMINI_API_KEY:
+        raise HTTPException(502, "GEMINI_API_KEY not configured on server")
+    model = genai.GenerativeModel(GEMINI_MODEL, system_instruction=system)
+    try:
+        resp = await asyncio.to_thread(model.generate_content, user_text)
+        raw = (resp.text or "").strip()
+    except Exception as e:
+        raise HTTPException(502, f"Gemini error: {e}")
     m = re.search(r"\{[\s\S]*\}", raw)
     if not m:
         raise HTTPException(502, "Model did not return JSON")
@@ -1206,37 +1203,11 @@ class VisualizeIn(BaseModel):
 @api.post("/visualize")
 async def visualize(body: VisualizeIn, user=Depends(require_user)):
     """Generate an educational diagram/illustration from text."""
-    try:
-        import anthropic as _anthropic
-        chat = _LlmChat(
-            api_key=EMERGENT_LLM_KEY,
-            session_id=new_id("viz"),
-            system_message=(
-                "You generate clear educational diagrams and illustrations. "
-                "Style: clean, labeled, white background, vibrant flat colors, minimal clutter. "
-                "Subject context: " + (body.subject or "general study")
-            ),
-        )
-        chat.with_model("gemini", "gemini-3.1-flash-image-preview").with_params(modalities=["image", "text"])
-
-        prompt = (
-            f"Create an educational illustration that explains: {body.prompt}\n"
-            "Constraints: square format, clear labels in English, simple and visually engaging."
-        )
-        text, images = await chat.send_message_multimodal_response(_UM(text=prompt))
-        if not images:
-            raise HTTPException(502, "No image was generated")
-        img = images[0]
-        return {
-            "image_b64": img["data"],
-            "mime_type": img.get("mime_type", "image/png"),
-            "caption": text or "",
-        }
-    except HTTPException:
-        raise
-    except Exception as e:
-        logger.exception("visualize failed")
-        raise HTTPException(502, f"Image generation failed: {e}")
+    raise HTTPException(
+        501,
+        "Image generation is not configured. This feature requires a paid image-generation API "
+        "(e.g. Gemini Imagen or DALL-E). Currently disabled."
+    )
 
 
 # =====================================================================
