@@ -1218,12 +1218,34 @@ class VisualizeIn(BaseModel):
 
 @api.post("/visualize")
 async def visualize(body: VisualizeIn, user=Depends(require_user)):
-    """Generate an educational diagram/illustration from text."""
-    raise HTTPException(
-        501,
-        "Image generation is not configured. This feature requires a paid image-generation API "
-        "(e.g. Gemini Imagen or DALL-E). Currently disabled."
+    """Generate an educational diagram/illustration from text using Pollinations.ai (free, no API key)."""
+    import urllib.parse
+    import base64 as _b64
+
+    style_prefix = (
+        "Educational diagram, clean, labeled, white background, vibrant flat colors, "
+        "minimal clutter, simple and clear illustration explaining: "
     )
+    subject_ctx = f" (context: {body.subject})" if body.subject else ""
+    full_prompt = f"{style_prefix}{body.prompt}{subject_ctx}"
+    encoded_prompt = urllib.parse.quote(full_prompt)
+    image_url = f"https://image.pollinations.ai/prompt/{encoded_prompt}?width=768&height=768&nologo=true"
+
+    try:
+        resp = await asyncio.to_thread(requests.get, image_url, timeout=60)
+        if resp.status_code != 200:
+            raise HTTPException(502, f"Image generation failed (status {resp.status_code})")
+        img_b64 = _b64.b64encode(resp.content).decode("utf-8")
+        return {
+            "image_b64": img_b64,
+            "mime_type": "image/jpeg",
+            "caption": body.prompt,
+        }
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.exception("visualize failed")
+        raise HTTPException(502, f"Image generation failed: {e}")
 
 
 # =====================================================================
